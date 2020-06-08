@@ -18,41 +18,6 @@ import java.util.Scanner;
  * @Description TODO
  */
 public class Flowchart {
-    public static TreeNode parse(CharStream stream, String method) {
-        Lexer lexer = new Java8Lexer(stream);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-        Java8Parser parser = new Java8Parser(tokens);
-
-        ParserRuleContext t = parser.compilationUnit();
-
-        TreeBuilder treeBuilder = new TreeBuilder();
-
-        treeBuilder.setMethod(method);
-
-
-        return treeBuilder.build(t);
-    }
-
-    public static TreeNode parseFile(String file, String method) throws IOException {
-
-        return parse(CharStreams.fromFileName(file, StandardCharsets.UTF_8), method);
-    }
-
-    public static TreeNode parseString(String string) {
-        String cString = "public class Exec{" +
-                "   public void exec(){" +
-                string +
-                "   }" +
-                "}";
-        return parse(CharStreams.fromString(cString), "exec");
-    }
-
-    public static TreeNode parseString(String string, String method) {
-
-        return parse(CharStreams.fromString(string), method);
-    }
 
     public static void main(String[] args) throws IOException {
 
@@ -68,7 +33,7 @@ public class Flowchart {
                 } else {
                     flowchartBuilder = new MermaidBuilder();
                 }
-                System.out.println(flowchartBuilder.builder(parseFile(filePath, method)));
+                System.out.println(flowchartBuilder.builder(TreeBuilder.parseFile(filePath, method)));
             } else {
                 System.err.println("no method");
                 Runtime.getRuntime().exit(-1);
@@ -87,7 +52,7 @@ public class Flowchart {
             } else {
                 flowchartBuilder = new MermaidBuilder();
             }
-            System.out.println(flowchartBuilder.builder(parseString(text)));
+            System.out.println(flowchartBuilder.builder(TreeBuilder.parseString(text)));
         }
     }
 }

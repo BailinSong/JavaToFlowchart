@@ -4,12 +4,15 @@ package ooo.reindeer.tools.java.flowchart;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import ooo.reindeer.tools.java.flowchart.java8.Java8Lexer;
 import ooo.reindeer.tools.java.flowchart.java8.Java8Parser;
 import ooo.reindeer.tools.java.flowchart.java8.Java8ParserBaseVisitor;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Stack;
 
@@ -27,6 +30,41 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
 
     public static final String FOR_INIT = "forInit", IF = "if", CONDITION = "condition", SWITCH = "switch", SWITCH_END = SWITCH + "_end", WHILE = "while", RETURN = "return", FOR_UPDATER = "forUpdater", BREAK = "break", CONTINUE = "continue", CASE = "case", BEGIN = "begin";
 
+    public static TreeNode parse(CharStream stream, String method) {
+        Lexer lexer = new Java8Lexer(stream);
+
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        Java8Parser parser = new Java8Parser(tokens);
+
+        ParserRuleContext t = parser.compilationUnit();
+
+        TreeBuilder treeBuilder = new TreeBuilder();
+
+        treeBuilder.setMethod(method);
+
+
+        return treeBuilder.build(t);
+    }
+
+    public static TreeNode parseFile(String file, String method) throws IOException {
+
+        return parse(CharStreams.fromFileName(file, StandardCharsets.UTF_8), method);
+    }
+
+    public static TreeNode parseString(String string) {
+        String cString = "public class Exec{" +
+                "   public void exec(){" +
+                string +
+                "   }" +
+                "}";
+        return parse(CharStreams.fromString(cString), "exec");
+    }
+
+    public static TreeNode parseString(String string, String method) {
+
+        return parse(CharStreams.fromString(string), method);
+    }
 
     @Builder.Default
     TreeNode root = TreeNode
@@ -332,7 +370,7 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
                     record(temp, interval);
                 }
                 for (Java8Parser.BlockStatementContext blockStatementContext : switchBlockStatementGroupContext.blockStatements().blockStatement()) {
-                    super.visitBlockStatement(blockStatementContext);
+                    visitBlockStatement(blockStatementContext);
                 }
             }
         }
