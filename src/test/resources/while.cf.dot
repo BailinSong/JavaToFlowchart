@@ -1,0 +1,10 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T64[ shape=diamond, label="a \< 10", style="filled", fillcolor="white"]
+F59T62[ shape=box, label="a++;", style="filled", fillcolor="white"]
+F66T76[ shape=box, label="println(a);", style="filled", fillcolor="white"]
+F0T0 -> F40T64
+F40T64 -> F59T62[label="true"]
+F59T62 -> F40T64
+F40T64 -> F66T76[label="false"]
+}

@@ -1,0 +1,16 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T129[ shape=diamond, label="a == 1", style="filled", fillcolor="white"]
+F56T59[ shape=box, label="a++;", style="filled", fillcolor="white"]
+F72T97[ shape=diamond, label="a == 2", style="filled", fillcolor="white"]
+F90T93[ shape=box, label="a--;", style="filled", fillcolor="white"]
+F101T127[ shape=diamond, label="a == 3", style="filled", fillcolor="white"]
+F119T123[ shape=box, label="a-=2;", style="filled", fillcolor="white"]
+F0T0 -> F40T129
+F90T93 -> F101T127
+F40T129 -> F56T59[label="true"]
+F40T129 -> F72T97[label="false"]
+F72T97 -> F90T93[label="true"]
+F101T127 -> F119T123[label="true"]
+F72T97 -> F101T127[label="false"]
+}

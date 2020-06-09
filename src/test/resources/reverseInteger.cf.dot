@@ -1,0 +1,33 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F45T75[ shape=diamond, label="x \>=0 && x \< 10", style="filled", fillcolor="white"]
+F66T75X[ shape=ellipse, label="return  x;", style="filled", fillcolor="white"]
+F81T119[ shape=box, label="StringBuilder sb = new StringBuilder();", style="filled", fillcolor="white"]
+F125T143[ shape=box, label="long xx = (long) x;", style="filled", fillcolor="white"]
+F149T205[ shape=diamond, label="xx \< 0", style="filled", fillcolor="white"]
+F169T183[ shape=box, label="sb.append('-');", style="filled", fillcolor="white"]
+F191T199[ shape=box, label="xx = -xx;", style="filled", fillcolor="white"]
+F211T275[ shape=diamond, label="xx != 0", style="filled", fillcolor="white"]
+F235T253[ shape=box, label="sb.append(xx % 10);", style="filled", fillcolor="white"]
+F261T269[ shape=box, label="xx /= 10;", style="filled", fillcolor="white"]
+F281T324[ shape=box, label="long result = Long.parseLong(sb.toString());", style="filled", fillcolor="white"]
+F330T431[ shape=diamond, label="result \< Integer.MIN_VALUE || result \> Integer.MAX_VALUE", style="filled", fillcolor="white"]
+F392T401X[ shape=ellipse, label="return  0;", style="filled", fillcolor="white"]
+F412T431X[ shape=ellipse, label="return (int) result;", style="filled", fillcolor="white"]
+F0T0 -> F45T75
+F81T119 -> F125T143
+F125T143 -> F149T205
+F169T183 -> F191T199
+F191T199 -> F211T275
+F235T253 -> F261T269
+F281T324 -> F330T431
+F45T75 -> F66T75X[label="true"]
+F149T205 -> F169T183[label="true"]
+F211T275 -> F235T253[label="true"]
+F330T431 -> F392T401X[label="true"]
+F330T431 -> F412T431X[label="false"]
+F261T269 -> F211T275
+F45T75 -> F81T119[label="false"]
+F149T205 -> F211T275[label="false"]
+F211T275 -> F281T324[label="false"]
+}

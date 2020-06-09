@@ -1,0 +1,21 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F45T70[ shape=diamond, label="l1 == null", style="filled", fillcolor="white"]
+F61T70X[ shape=ellipse, label="return l2;", style="filled", fillcolor="white"]
+F76T101[ shape=diamond, label="l2 == null", style="filled", fillcolor="white"]
+F92T101X[ shape=ellipse, label="return l1;", style="filled", fillcolor="white"]
+F107T269[ shape=diamond, label="l1.val \< l2.val", style="filled", fillcolor="white"]
+F136T172[ shape=box, label="l1.next = mergeTwoLists(l1.next, l2);", style="filled", fillcolor="white"]
+F180T189[ shape=ellipse, label="l1", style="filled", fillcolor="white"]
+F210T246[ shape=box, label="l2.next = mergeTwoLists(l1, l2.next);", style="filled", fillcolor="white"]
+F254T263[ shape=ellipse, label="l2", style="filled", fillcolor="white"]
+F0T0 -> F45T70
+F136T172 -> F180T189
+F210T246 -> F254T263
+F45T70 -> F61T70X[label="true"]
+F76T101 -> F92T101X[label="true"]
+F107T269 -> F136T172[label="true"]
+F107T269 -> F210T246[label="false"]
+F45T70 -> F76T101[label="false"]
+F76T101 -> F107T269[label="false"]
+}

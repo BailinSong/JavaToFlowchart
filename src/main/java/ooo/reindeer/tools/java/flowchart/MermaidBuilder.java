@@ -18,7 +18,7 @@ public class MermaidBuilder extends FlowchartBuilder {
         super.setNodeText(new Function<Node, String>() {
             @Override
             public String apply(Node node) {
-                if (TreeBuilder.RETURN.equalsIgnoreCase(node.getType()) || TreeBuilder.BEGIN.equalsIgnoreCase(node.getType())) {
+                if (TreeBuilder.RETURN.equalsIgnoreCase(node.getType()) || TreeBuilder.BEGIN.equalsIgnoreCase(node.getType())|| TreeBuilder.END.equalsIgnoreCase(node.getType())) {
                     return node.getId() + "((\"" + toSafeText(node.getText()) + "\"))";
                 } else if (node.getType().equalsIgnoreCase("if") || node.getType().equalsIgnoreCase("switch")) {
                     return node.getId() + "{\"" + toSafeText(node.getText()) + "\"}";

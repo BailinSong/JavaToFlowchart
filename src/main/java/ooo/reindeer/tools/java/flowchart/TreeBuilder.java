@@ -28,7 +28,7 @@ import java.util.Stack;
 public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
 
 
-    public static final String FOR_INIT = "forInit", IF = "if", CONDITION = "condition", SWITCH = "switch", SWITCH_END = SWITCH + "_end", WHILE = "while", RETURN = "return", FOR_UPDATER = "forUpdater", BREAK = "break", CONTINUE = "continue", CASE = "case", BEGIN = "begin";
+    public static final String FOR_INIT = "forInit", IF = "if", CONDITION = "condition", SWITCH = "switch", SWITCH_END = SWITCH + "_end", WHILE = "while", RETURN = "return", FOR_UPDATER = "forUpdater", BREAK = "break", CONTINUE = "continue", CASE = "case", BEGIN = "begin", END = "end";
 
     public static TreeNode parse(CharStream stream, String method) {
         Lexer lexer = new Java8Lexer(stream);
@@ -121,6 +121,9 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
     }
 
     public String getExpressionText(ParserRuleContext expr) {
+        if(expr==null){
+            return "end";
+        }
         return expr.getStart().getInputStream().getText(Interval.of(expr.getStart().getStartIndex(), expr.getStop().getStopIndex()));
     }
 
@@ -172,16 +175,30 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
     @Override
     public TreeNode visitBreakStatement(Java8Parser.BreakStatementContext ctx) {
         TreeNode treeNode = root.findNode(getID(ctx));
-        treeNode.setText(getExpressionText(ctx));
-        treeNode.setType(BREAK);
+        if (!(treeNode.getType() == null || treeNode.getType().isEmpty())) {
+            //elseif 不改变原有节点重新创建if节点
+            TreeNode temp = TreeNode.builder().type(BREAK).text(getExpressionText(ctx)).interval(treeNode.getInterval()).id(treeNode.getId() + BREAK).build();
+            record(temp, temp.getInterval());
+        } else {
+            treeNode.setText(getExpressionText(ctx));
+            treeNode.setType(BREAK);
+        }
+
         return super.visitBreakStatement(ctx);
     }
 
     @Override
     public TreeNode visitContinueStatement(Java8Parser.ContinueStatementContext ctx) {
         TreeNode treeNode = root.findNode(getID(ctx));
-        treeNode.setText(getExpressionText(ctx));
-        treeNode.setType(CONTINUE);
+        if (!(treeNode.getType() == null || treeNode.getType().isEmpty())) {
+            //elseif 不改变原有节点重新创建if节点
+            TreeNode temp = TreeNode.builder().type(CONTINUE).text(getExpressionText(ctx)).interval(treeNode.getInterval()).id(treeNode.getId() + CONTINUE).build();
+            record(temp, temp.getInterval());
+        } else {
+            treeNode.setText(getExpressionText(ctx));
+            treeNode.setType(CONTINUE);
+        }
+
         return super.visitContinueStatement(ctx);
     }
 
@@ -298,8 +315,15 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
 
 
         TreeNode treeNode = root.findNode(getID(ctx));
-        treeNode.setText(getExpressionText(ctx.expression()));
-        treeNode.setType(IF);
+
+        if (!(treeNode.getType() == null || treeNode.getType().isEmpty())) {
+            //elseif 不改变原有节点重新创建if节点
+            TreeNode temp = TreeNode.builder().type(IF).text(getExpressionText(ctx.expression())).interval(treeNode.getInterval()).id(treeNode.getId() + "_elseIf").build();
+            record(temp, temp.getInterval());
+        } else {
+            treeNode.setText(getExpressionText(ctx.expression()));
+            treeNode.setType(IF);
+        }
 
         Java8Parser.StatementContext trueBlock = ctx.getRuleContext(Java8Parser.StatementContext.class, 0);
 
@@ -325,8 +349,21 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
     @Override
     public TreeNode visitReturnStatement(Java8Parser.ReturnStatementContext ctx) {
         TreeNode treeNode = root.findNode(getID(ctx));
-        treeNode.setText(getExpressionText(ctx.expression()));
-        treeNode.setType(RETURN);
+        if(treeNode.getType().equals(CONDITION)&&root.findNode(getID(ctx)+"X")==null){
+
+            Interval interval = Interval.of(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex());
+
+            TreeNode temp = TreeNode.builder().id(getID(ctx)+"X").text(getExpressionText(ctx)).type(RETURN).interval(interval).build();
+
+            record(temp, interval);
+        }else if(root.findNode(getID(ctx)+"X")!=null){
+            treeNode=root.findNode(getID(ctx)+"X");
+            treeNode.setText(getExpressionText(ctx.expression()));
+            treeNode.setType(RETURN);
+        }else{
+            treeNode.setText(getExpressionText(ctx.expression()));
+            treeNode.setType(RETURN);
+        }
 
         return super.visitReturnStatement(ctx);
     }
@@ -334,13 +371,23 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
     @Override
     public TreeNode visitStatementWithoutTrailingSubstatement(Java8Parser.StatementWithoutTrailingSubstatementContext ctx) {
         TreeNode treeNode = root.findNode(getID(ctx));
+
         if (treeNode == null) {
             Interval interval = Interval.of(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex());
 
             TreeNode temp = TreeNode.builder().id(getID(ctx)).text(getExpressionText(ctx)).interval(interval).build();
 
             record(temp, interval);
+        }else if(treeNode.getType().contains(CONDITION)){
+            if(ctx.expressionStatement()!=null){
+                Interval interval = Interval.of(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex());
+
+                TreeNode temp = TreeNode.builder().id(getID(ctx)+"X").text(getExpressionText(ctx)).interval(interval).build();
+
+                record(temp, interval);
+            }
         }
+
         return super.visitStatementWithoutTrailingSubstatement(ctx);
     }
 
@@ -369,10 +416,11 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
                     TreeNode temp = TreeNode.builder().id(getID(switchLabelContext)).text("default").type(CASE).interval(interval).build();
                     record(temp, interval);
                 }
-                for (Java8Parser.BlockStatementContext blockStatementContext : switchBlockStatementGroupContext.blockStatements().blockStatement()) {
-                    visitBlockStatement(blockStatementContext);
-                }
             }
+                for (int i = 1; i < switchBlockStatementGroupContext.children.size(); i++) {
+                    visitBlockStatements((Java8Parser.BlockStatementsContext)switchBlockStatementGroupContext.children.get(i));
+                }
+
         }
 
 

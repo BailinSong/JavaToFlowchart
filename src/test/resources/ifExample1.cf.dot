@@ -1,0 +1,26 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F54T487[ shape=diamond, label="prev != null", style="filled", fillcolor="white"]
+F90T119[ shape=box, label="prev.stops.addLink(cur.start);", style="filled", fillcolor="white"]
+F137T380[ shape=diamond, label="prev.type == IF", style="filled", fillcolor="white"]
+F178T221[ shape=box, label="prev.start.addLink(cur.start).with(\"false\");", style="filled", fillcolor="white"]
+F246T380TelseIf[ shape=diamond, label="prev.type == FOR", style="filled", fillcolor="white"]
+F287T299[ shape=box, label="prev.doFor();", style="filled", fillcolor="white"]
+F344T362[ shape=box, label="prev.doSomething();", style="filled", fillcolor="white"]
+F398T408[ shape=box, label="prev = cur;", style="filled", fillcolor="white"]
+F449T471[ shape=box, label="prev.doSomethingElse();", style="filled", fillcolor="white"]
+F503T522[ shape=box, label="Node a = new Node();", style="filled", fillcolor="white"]
+F0T0 -> F54T487
+F90T119 -> F137T380
+F344T362 -> F398T408
+F449T471 -> F503T522
+F54T487 -> F90T119[label="true"]
+F54T487 -> F449T471[label="false"]
+F137T380 -> F178T221[label="true"]
+F137T380 -> F246T380TelseIf[label="false"]
+F246T380TelseIf -> F287T299[label="true"]
+F246T380TelseIf -> F344T362[label="false"]
+F178T221 -> F398T408
+F287T299 -> F398T408
+F398T408 -> F503T522
+}

@@ -1,0 +1,25 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F45T63[ shape=box, label="int len = a.length;", style="filled", fillcolor="white"]
+F69T91[ shape=box, label="int l = 0, r = len - 1;", style="filled", fillcolor="white"]
+F97T292[ shape=diamond, label="l \< r", style="filled", fillcolor="white"]
+F119T140[ shape=box, label="int mid = (l + r) / 2;", style="filled", fillcolor="white"]
+F148T286[ shape=diamond, label="a[mid] \< k", style="filled", fillcolor="white"]
+F174T185[ shape=box, label="l = mid + 1;", style="filled", fillcolor="white"]
+F206T286TelseIf[ shape=diamond, label="a[mid] \> k", style="filled", fillcolor="white"]
+F232T243[ shape=box, label="r = mid - 1;", style="filled", fillcolor="white"]
+F268T278[ shape=ellipse, label="mid", style="filled", fillcolor="white"]
+F298T307[ shape=ellipse, label="-1", style="filled", fillcolor="white"]
+F0T0 -> F45T63
+F45T63 -> F69T91
+F69T91 -> F97T292
+F119T140 -> F148T286
+F97T292 -> F119T140[label="true"]
+F148T286 -> F174T185[label="true"]
+F148T286 -> F206T286TelseIf[label="false"]
+F206T286TelseIf -> F232T243[label="true"]
+F206T286TelseIf -> F268T278[label="false"]
+F174T185 -> F97T292
+F232T243 -> F97T292
+F97T292 -> F298T307[label="false"]
+}

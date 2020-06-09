@@ -1,0 +1,19 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T116[ shape=diamond, label="a", style="filled", fillcolor="white"]
+F52T114[ shape=diamond, label="a", style="filled", fillcolor="white"]
+F63T68[ shape=box, label="doA();", style="filled", fillcolor="white"]
+F77T114TelseIf[ shape=diamond, label="b", style="filled", fillcolor="white"]
+F88T93[ shape=box, label="doB();", style="filled", fillcolor="white"]
+F106T112[ shape=ellipse, label="end", style="filled", fillcolor="white"]
+F118T126[ shape=box, label="doSome();", style="filled", fillcolor="white"]
+F0T0 -> F40T116
+F40T116 -> F52T114[label="true"]
+F52T114 -> F63T68[label="true"]
+F52T114 -> F77T114TelseIf[label="false"]
+F77T114TelseIf -> F88T93[label="true"]
+F77T114TelseIf -> F106T112[label="false"]
+F63T68 -> F40T116
+F88T93 -> F40T116
+F40T116 -> F118T126[label="false"]
+}

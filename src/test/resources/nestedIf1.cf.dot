@@ -1,0 +1,17 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T185[ shape=diamond, label="prev != null", style="filled", fillcolor="white"]
+F62T91[ shape=box, label="prev.stops.addLink(cur.start);", style="filled", fillcolor="white"]
+F95T169[ shape=diamond, label="prev.type == IF", style="filled", fillcolor="white"]
+F122T165[ shape=box, label="prev.start.addLink(cur.start).with(\"false\");", style="filled", fillcolor="white"]
+F173T183[ shape=box, label="prev = cur;", style="filled", fillcolor="white"]
+F187T206[ shape=box, label="Node a = new Node();", style="filled", fillcolor="white"]
+F0T0 -> F40T185
+F62T91 -> F95T169
+F122T165 -> F173T183
+F173T183 -> F187T206
+F40T185 -> F62T91[label="true"]
+F95T169 -> F122T165[label="true"]
+F95T169 -> F173T183[label="false"]
+F40T185 -> F187T206[label="false"]
+}

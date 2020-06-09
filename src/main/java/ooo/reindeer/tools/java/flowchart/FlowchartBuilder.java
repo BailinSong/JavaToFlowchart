@@ -21,7 +21,13 @@ import static ooo.reindeer.tools.java.flowchart.TreeBuilder.*;
  */
 public abstract class FlowchartBuilder {
 
+    @Setter
+    @Getter
     boolean debug = false;
+
+    @Setter
+    @Getter
+    boolean autoEndNode=false;
 
     List<Node> nodes = new ArrayList<>();
     List<Relation> relationList = new ArrayList<>();
@@ -51,17 +57,23 @@ public abstract class FlowchartBuilder {
                                 || treeNode1.getType().equals(RETURN)
                                 || treeNode1.getType().equals(CONDITION)
                                 || treeNode1.getType().equals(WHILE)
-                                || treeNode1.getType().equals(SWITCH_END))) {
+                                || treeNode1.getType().equals(SWITCH_END)
+                        )) {
                             for (Relation relation : relationList) {
                                 if (relation.getFrom().equals(treeNode1.getId())) {
                                     return;
                                 }
                             }
+                            TreeNode pn = tn;
+                            while (pn.getType().equals(CASE) || pn.getType().equals(SWITCH_END)) {
+                                pn = pn.findeNearNext();
+                            }
+
                             relationList.add(Relation
                                     .builder()
                                     .from(treeNode1.getId())
                                     .condition(appendDebugTag("BBTR"))
-                                    .to(tn.getId())
+                                    .to(pn.getId())
                                     .converter(relationText)
                                     .build());
                         }
@@ -146,6 +158,7 @@ public abstract class FlowchartBuilder {
                     treeNode.getType().equals(CONDITION)
                             || treeNode.getType().equals(CASE)
                             || treeNode.getType().equals(SWITCH_END)
+                            || treeNode.getType().equals(WHILE)
             )
             ) {
                 relation = Relation
@@ -202,7 +215,8 @@ public abstract class FlowchartBuilder {
 
 
             //if块为流程中最后一个步骤特殊处理
-            if (treeNode.getType().equals(IF) && treeNode.lastOfBlock()) {
+            if (treeNode.getType().equals(IF) && treeNode.lastOfBlock()&&
+                    (treeNode.getPrevious()==null||(treeNode.getPrevious()!=null&&!treeNode.getPrevious().getType().equals(IF)))) {
                 boolean hasFalse = ifBlockHasElse(treeNode);
                 if (hasFalse) {
                     return;
@@ -215,13 +229,19 @@ public abstract class FlowchartBuilder {
                     }
                 }
                 try {
-                    for (int index = pn.getParent().getSub().size() - 1; index >= 0; index--) {
-                        if (pn.getParent().getSub().get(index).getPrevious().equals(pn)) {
-                            relationList.add(Relation.builder().from(treeNode.getId()).to(pn.getParent().getSub().get(index).getId()).condition("false" + appendDebugTag("BIDCR")).converter(relationText
-                            ).build());
-                            return;
-                        }
+                    pn = pn.findeNearNext();
+                    while (pn.getType().equals(CASE) || pn.getType().equals(SWITCH_END)) {
+                        pn = pn.findeNearNext();
                     }
+                    relationList.add(Relation.builder().from(treeNode.getId()).to(pn.getId()).condition("false" + appendDebugTag("BIDCR1")).converter(relationText
+                    ).build());
+                    return;
+
+//                    for (int index = pn.getParent().getSub().size() - 1; index >= 0; index--) {
+//                        if (pn.getParent().getSub().get(index).getPrevious().equals(pn)) {
+//
+//                        }
+//                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -237,11 +257,15 @@ public abstract class FlowchartBuilder {
                 if (rpn.getType().equals(IF)) {
 
                     boolean hasFalse = ifBlockHasElse(rpn);
-
+                    boolean hasTrue = ifBlockHasTrue(rpn);
                     //如果没有else 分支则泽东生成else分支
                     if (!hasFalse) {
+                        TreeNode pn = treeNode;
+                        if (treeNode.getType().equalsIgnoreCase(WHILE)) {
+                            pn = getRealNode(treeNode.getParent());
 
-                        relationList.add(Relation.builder().from(rpn.getId()).to(treeNode.id).condition("false" + appendDebugTag("BIDCR")).converter(relationText
+                        }
+                        relationList.add(Relation.builder().from(rpn.getId()).to(pn.id).condition(((hasTrue) ? "false" : "") + appendDebugTag("BIDCR2")).converter(relationText
                         ).build());
 
                     }
@@ -259,13 +283,24 @@ public abstract class FlowchartBuilder {
 
                 treeNode.getSub().forEach(treeNode1 -> {
                     if (treeNode1.getType().equals(CONDITION)) {
-                        relationList.add(Relation
-                                .builder()
-                                .from(treeNode.getId())
-                                .condition(treeNode1.getText() + appendDebugTag("BIR"))
-                                .to(treeNode1.getSub().get(0).getId())
-                                .converter(relationText)
-                                .build());
+
+                        if (treeNode1.getSub().size() < 1) {
+
+//                            TreeNode pn = treeNode1.findeNearNext();
+//                            while(){
+//
+//                            }
+
+                        } else {
+
+                            relationList.add(Relation
+                                    .builder()
+                                    .from(treeNode.getId())
+                                    .condition(treeNode1.getText() + appendDebugTag("BIR"))
+                                    .to(treeNode1.getSub().get(0).getId())
+                                    .converter(relationText)
+                                    .build());
+                        }
                     }
                 });
             }
@@ -289,21 +324,24 @@ public abstract class FlowchartBuilder {
                         if (caseList.size() > 0) {
                             while (caseList.size() > 0) {
                                 TreeNode pn = caseList.remove(0);
-                                Relation merge = Relation.builder().from(treeNode1.getId()).to(treeNode1.getSub().get(i).getId()).condition(pn.getText() + appendDebugTag("BSCR")).converter(relationText
+                                Relation merge = Relation.builder().from(treeNode1.getId()).to(treeNode1.getSub().get(i).getId()).condition(pn.getText() + appendDebugTag("BSCR.1")).converter(relationText
                                 ).build();
                                 relationList.add(merge);
                             }
                         }
-                        if (!treeNode1.getSub().get(i).getType().equals(BREAK)) {
+                        if (!(treeNode1.getSub().get(i).getType().equals(BREAK) || treeNode1.getSub().get(i).getType().equals(IF))) {
                             TreeNode fnn = treeNode1.getSub().get(i).findeNearNext();
                             while ((fnn.getType().equals(CASE) || fnn.getType().equals(SWITCH_END))) {
                                 fnn = fnn.findeNearNext();
+
                                 if (fnn.getType().equals(WHILE)) {
                                     fnn = getRealNode(fnn.getParent());
                                 }
-                                Relation merge = Relation.builder().from(treeNode1.getSub().get(i).getId()).to(fnn.getId()).condition(appendDebugTag("BSCR")).converter(relationText
-                                ).build();
-                                relationList.add(merge);
+                                if(!(fnn.getType().equals(CASE) || fnn.getType().equals(SWITCH_END))) {
+                                    Relation merge = Relation.builder().from(treeNode1.getSub().get(i).getId()).to(fnn.getId()).condition(appendDebugTag("BSCR.2")).converter(relationText
+                                    ).build();
+                                    relationList.add(merge);
+                                }
                             }
                         }
                     }
@@ -313,7 +351,7 @@ public abstract class FlowchartBuilder {
                     if (fnn.getType().equals(WHILE)) {
                         fnn = getRealNode(fnn.getParent());
                     }
-                    Relation merge = Relation.builder().from(treeNode1.getId()).to(fnn.getId()).condition("default" + appendDebugTag("BSCR")).converter(relationText
+                    Relation merge = Relation.builder().from(treeNode1.getId()).to(fnn.getId()).condition("default" + appendDebugTag("BSCR.3")).converter(relationText
                     ).build();
                     relationList.add(merge);
                 }
@@ -351,140 +389,6 @@ public abstract class FlowchartBuilder {
         });
     }
 
-    /*
-        private void buildRelations(TreeNode tn) {
-            TreeNode pNode = tn.findPrevious();
-            Relation relation;
-
-    //        if (tn.getType().equalsIgnoreCase(TreeBuilder.FOR_UPDATER)) {
-    //            TreeNode ppNode = tn;
-    //            do {
-    //                ppNode = ppNode.getParent();
-    //            } while (!ppNode.getType().equalsIgnoreCase(TreeBuilder.IF));
-    //            Relation merge = Relation.builder().from(tn.getId()).to(ppNode.getId()).converter(relationText
-    //            ).build();
-    //            relationList.add(merge);
-    //
-    //        }
-
-    //        if(tn.getType().equalsIgnoreCase("while")){
-    //            TreeNode ppNode=tn;
-    //            do{
-    //                ppNode=ppNode.getParent();
-    //            }while (!ppNode.getType().equalsIgnoreCase("if"));
-    //            Relation merge = Relation.builder().from(tn.getId()).to(ppNode.getId()).convert(MermaidBuilder::FT
-    //            ).build();
-    //        }
-
-    //        if(tn.findPrevious().getType().equalsIgnoreCase("forInit")){
-    //            TreeNode ppNode=tn;
-    //
-    //            Relation merge = Relation.builder().from(tn.findPrevious().getSub().get(0).getId()).to(tn.getId()).convert(MermaidBuilder::FT
-    //            ).build();
-    //            relationList.add(merge);
-    //
-    //        }
-
-            if (tn.getPrevious() != null && ("if".equalsIgnoreCase(tn.getPrevious().type))) {
-
-                boolean hasFalse = false;
-
-                //循环所有分支
-                for (TreeNode node : tn.getPrevious().getSub()) {
-
-                    //默认没有 else分支
-                    hasFalse |= "false".equalsIgnoreCase(node.getText());
-
-                    node.walk(treeNode1 -> {
-
-                        if (merged.contains(treeNode1.getId())) {
-                            return;
-                        }
-
-
-                        if (treeNode1.lastOfBlock()) {
-                            if("forUpdater".equalsIgnoreCase(treeNode1.getType())||"while".equalsIgnoreCase(treeNode1.getType())){
-                                TreeNode ppNode = treeNode1.getParent();
-                                do {
-
-                                    ppNode = ppNode.findPrevious();
-
-                                } while ("condition".equalsIgnoreCase(ppNode.getType()));
-                                Relation merge = Relation.builder().from(ppNode.getId()).to(tn.getId()).condition("falseBB").converter(relationText
-                                ).build();
-                                relationList.add(merge);
-                                merged.add(treeNode1.getId());
-
-                            }else if (!"return".equalsIgnoreCase(treeNode1.getType())
-                                    && !"condition".equalsIgnoreCase(treeNode1.getType())
-                                    && !"if".equalsIgnoreCase(treeNode1.getType())
-                                    ) {
-                                if (tn.getType().equalsIgnoreCase("while")) {
-
-                                    TreeNode ppNode = tn;
-                                    do {
-                                        ppNode = ppNode.getParent();
-                                    } while (!ppNode.getType().equalsIgnoreCase("if"));
-                                    Relation merge = Relation.builder().from(treeNode1.getId()).to(ppNode.getId()).converter(relationText
-                                    ).build();
-                                    relationList.add(merge);
-                                    merged.add(treeNode1.getId());
-                                } else {
-
-                                    Relation merge = Relation.builder().from(treeNode1.getId()).to(tn.id).converter(relationText
-                                    ).condition("TESTGGGGGGGGGGG").build();
-                                    relationList.add(merge);
-                                    merged.add(treeNode1.getId());
-                                }
-                            }
-                        }
-
-                    });
-                }
-
-                //如果没有else 分支则泽东生成else分支
-                if (!hasFalse&&!tn.getType().equalsIgnoreCase(TreeBuilder.FOR_UPDATER)) {
-                    Relation merge = Relation.builder().from(tn.getPrevious().getId()).to(tn.id).condition("falseAA").converter(relationText
-                    ).build();
-                    relationList.add(merge);
-
-                }
-            }else{
-                relation = Relation.builder().from(pNode.getId()).to(tn.id).converter(relationText).build();
-                relationList.add(relation);
-            }
-                if (tn.getType().equalsIgnoreCase("forUpdater")) {
-
-
-                    TreeNode ppNode = tn.getParent();
-                    do {
-
-                        ppNode = ppNode.findPrevious();
-
-                    } while ("condition".equalsIgnoreCase(ppNode.getType()));
-
-                    relation = Relation.builder().from(tn.id).to(ppNode.getId()).converter(relationText
-                    ).build();
-                    relationList.add(relation);
-
-
-                    if (tn.getPrevious() == null) {
-                        relation = Relation.builder().from(pNode.getId()).to(tn.id).condition("true").converter(relationText
-                        ).build();
-                        relationList.add(relation);
-                    }
-    //                else {
-    //                    relation = Relation.builder().from(pNode.getId()).to(tn.id).converter(relationText
-    //                    ).build();
-    //                    relationList.add(relation);
-    //                }
-
-
-                }
-
-
-        }
-    */
     public String builder(TreeNode treeNode) {
         initNodes(treeNode);
         initRelation(treeNode);
@@ -496,7 +400,8 @@ public abstract class FlowchartBuilder {
 
     public abstract StringBuilder builderString(List<Node> nodes, List<Relation> relationList);
 
-    private void createNode(TreeNode tn) {
+    private void
+    createNode(TreeNode tn) {
 
 
         if (!ignore.contains(tn.getType())) {
@@ -522,7 +427,17 @@ public abstract class FlowchartBuilder {
         return hasFalse;
     }
 
+    private boolean ifBlockHasTrue(TreeNode rpn) {
+        boolean hasFalse = false;
+
+        for (TreeNode node : rpn.getSub()) {
+            hasFalse |= "true".equalsIgnoreCase(node.getText());
+        }
+        return hasFalse;
+    }
+
     private void initNodes(TreeNode treeNode) {
+
         TreeNode.walk(treeNode, this::createNode);
     }
 
@@ -537,42 +452,47 @@ public abstract class FlowchartBuilder {
         buildContinueRelations(treeNode);
         buildIfDefaultConditionalRelations(treeNode);
         buildBlockTailRelations(treeNode);
-
-    }
-/*
-    private void initRelation(TreeNode treeNode) {
-
-
-        treeNode.walk(treeNode, tn -> {
-
-            if ("condition".equalsIgnoreCase(tn.getType())) {
-                return;
-            }
-
-            if (tn.findPrevious() == null) {
-                return;
-            }
-            Relation relation;
-
-            if ("condition".equalsIgnoreCase(tn.findPrevious().getType())) {
-                TreeNode pNode = tn.findPrevious();
-                TreeNode ppNode = pNode;
-                do {
-
-                    ppNode = ppNode.findPrevious();
-
-                } while ("condition".equalsIgnoreCase(ppNode.getType()));
-                relation = Relation.builder().from(ppNode.getId()).to(tn.id).condition(pNode.text).converter(relationText
-
-                ).build();
-                relationList.add(relation);
-            } else {
-                buildRelations(tn);
-            }
-
-
-        });
+        if(isAutoEndNode()) {
+            buildEndRelations(treeNode);
+        }
     }
 
- */
+    private void buildEndRelations(TreeNode treeNode) {
+        boolean needEndNode=false;
+        TreeNode endNode = TreeNode.builder().id(END).text(END).type(END).build();
+        List<Relation> endRelationList =new ArrayList<>();
+        for (Relation relation : relationList) {
+
+            boolean isReturn=false;
+            for (Node node : nodes) {
+                if(relation.getTo().equals(node.getId())&&node.getType().equals(RETURN)) {
+                    isReturn=true;
+                    break;
+                }
+            }
+
+            if(isReturn) {
+                continue;
+            }
+
+            boolean isEnd=true;
+            for (Relation relation1 : relationList) {
+                if(relation.getTo().equals(relation1.getFrom())){
+                    isEnd=false;
+                    break;
+                }
+            }
+
+            if(isEnd){
+                endRelationList.add(Relation.builder().from(relation.getTo()).to(endNode.getId()).converter(relationText).condition(appendDebugTag("BER")).build());
+            }
+        }
+
+        if(endRelationList.size()>0){
+            createNode(endNode);
+            relationList.addAll(endRelationList);
+        }
+    }
+
+
 }

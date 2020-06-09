@@ -1,0 +1,32 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T177[ shape=diamond, label="currSum == target", style="filled", fillcolor="white"]
+F71T108[ shape=box, label="ans.add(new ArrayList\<\>(combination));", style="filled", fillcolor="white"]
+F116T122[ shape=ellipse, label="end", style="filled", fillcolor="white"]
+F135T177TelseIf[ shape=diamond, label="currSum \> target", style="filled", fillcolor="white"]
+F165T171[ shape=ellipse, label="end", style="filled", fillcolor="white"]
+F183T533[ shape=box, label="int i = start", style="filled", fillcolor="white"]
+F203T223[ shape=diamond, label="i \< candidates.length", style="filled", fillcolor="white"]
+F239T268[ shape=box, label="int candidate = candidates[i];", style="filled", fillcolor="white"]
+F276T302[ shape=box, label="combination.add(candidate);", style="filled", fillcolor="white"]
+F310T330[ shape=box, label="currSum += candidate;", style="filled", fillcolor="white"]
+F387T449[ shape=box, label="backtracking(ans, combination, currSum, i, candidates, target);", style="filled", fillcolor="white"]
+F457T499[ shape=box, label="combination.remove(combination.size() - 1);", style="filled", fillcolor="white"]
+F507T527[ shape=box, label="currSum -= candidate;", style="filled", fillcolor="white"]
+F226T228[ shape=box, label="i++", style="filled", fillcolor="white"]
+F0T0 -> F40T177
+F71T108 -> F116T122
+F239T268 -> F276T302
+F276T302 -> F310T330
+F310T330 -> F387T449
+F387T449 -> F457T499
+F457T499 -> F507T527
+F507T527 -> F226T228
+F40T177 -> F71T108[label="true"]
+F40T177 -> F135T177TelseIf[label="false"]
+F135T177TelseIf -> F165T171[label="true"]
+F203T223 -> F239T268[label="true"]
+F183T533 -> F203T223
+F226T228 -> F203T223
+F135T177TelseIf -> F183T533[label="false"]
+}

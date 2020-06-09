@@ -1,0 +1,32 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T73[ shape=box, label="boolean[] dp = new boolean[N + 1];", style="filled", fillcolor="white"]
+F77T99[ shape=box, label="Arrays.fill(dp, false);", style="filled", fillcolor="white"]
+F103T271[ shape=box, label="int i = 1", style="filled", fillcolor="white"]
+F119T124[ shape=diamond, label="i \<= N", style="filled", fillcolor="white"]
+F138T255[ shape=box, label="int x = 1", style="filled", fillcolor="white"]
+F154T158[ shape=diamond, label="x \< i", style="filled", fillcolor="white"]
+F174T249[ shape=diamond, label="i % x == 0 && !dp[i - x]", style="filled", fillcolor="white"]
+F214T226[ shape=box, label="dp[i] = true;", style="filled", fillcolor="white"]
+F236T241[ shape=box, label="break;", style="filled", fillcolor="white"]
+F161T163[ shape=box, label="x++", style="filled", fillcolor="white"]
+F261T267[ shape=box, label="test();", style="filled", fillcolor="white"]
+F127T129[ shape=box, label="i++", style="filled", fillcolor="white"]
+F274T286[ shape=ellipse, label="dp[N]", style="filled", fillcolor="white"]
+F0T0 -> F40T73
+F40T73 -> F77T99
+F77T99 -> F103T271
+F214T226 -> F236T241
+F261T267 -> F127T129
+F119T124 -> F138T255[label="true"]
+F154T158 -> F174T249[label="true"]
+F174T249 -> F214T226[label="true"]
+F103T271 -> F119T124
+F138T255 -> F154T158
+F161T163 -> F154T158
+F127T129 -> F119T124
+F236T241 -> F261T267
+F174T249 -> F161T163[label="false"]
+F154T158 -> F261T267[label="false"]
+F119T124 -> F274T286[label="false"]
+}

@@ -1,0 +1,29 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T45[ shape=box, label="int a;", style="filled", fillcolor="white"]
+F47T202[ shape=diamond, label="type", style="filled", fillcolor="white"]
+F82T87[ shape=box, label="a = 1;", style="filled", fillcolor="white"]
+F93T98[ shape=box, label="break;", style="filled", fillcolor="white"]
+F116T121[ shape=box, label="a = 2;", style="filled", fillcolor="white"]
+F127T132[ shape=box, label="break;", style="filled", fillcolor="white"]
+F152T156[ shape=box, label="a= 3;", style="filled", fillcolor="white"]
+F162T167[ shape=box, label="break;", style="filled", fillcolor="white"]
+F184T189[ shape=box, label="a = 4;", style="filled", fillcolor="white"]
+F195T200[ shape=box, label="break;", style="filled", fillcolor="white"]
+F204T214[ shape=box, label="println(a);", style="filled", fillcolor="white"]
+F0T0 -> F40T45
+F40T45 -> F47T202
+F82T87 -> F93T98
+F116T121 -> F127T132
+F152T156 -> F162T167
+F184T189 -> F195T200
+F47T202 -> F82T87[label="DOWHILE"]
+F47T202 -> F116T121[label="FOR"]
+F47T202 -> F152T156[label="WHILE"]
+F47T202 -> F184T189[label="IF"]
+F47T202 -> F204T214[label="default"]
+F93T98 -> F204T214
+F127T132 -> F204T214
+F162T167 -> F204T214
+F195T200 -> F204T214
+}

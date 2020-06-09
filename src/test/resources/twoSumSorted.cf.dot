@@ -1,0 +1,30 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F45T67[ shape=box, label="int[] ans = new int[2];", style="filled", fillcolor="white"]
+F73T82[ shape=box, label="int i = 0;", style="filled", fillcolor="white"]
+F88T114[ shape=box, label="int j = numbers.length - 1;", style="filled", fillcolor="white"]
+F120T420[ shape=diamond, label="i \< j", style="filled", fillcolor="white"]
+F142T414[ shape=diamond, label="numbers[i] + numbers[j] == target", style="filled", fillcolor="white"]
+F191T205[ shape=box, label="ans[0] = i + 1;", style="filled", fillcolor="white"]
+F215T229[ shape=box, label="ans[1] = j + 1;", style="filled", fillcolor="white"]
+F239T244[ shape=box, label="break;", style="filled", fillcolor="white"]
+F259T414TelseIf[ shape=diamond, label="numbers[i] + numbers[j] \> target", style="filled", fillcolor="white"]
+F369T375[ shape=box, label="j -= 1;", style="filled", fillcolor="white"]
+F400T406[ shape=box, label="i += 1;", style="filled", fillcolor="white"]
+F426T436[ shape=ellipse, label="ans", style="filled", fillcolor="white"]
+F0T0 -> F45T67
+F45T67 -> F73T82
+F73T82 -> F88T114
+F88T114 -> F120T420
+F191T205 -> F215T229
+F215T229 -> F239T244
+F120T420 -> F142T414[label="true"]
+F142T414 -> F191T205[label="true"]
+F142T414 -> F259T414TelseIf[label="false"]
+F259T414TelseIf -> F369T375[label="true"]
+F259T414TelseIf -> F400T406[label="false"]
+F369T375 -> F120T420
+F400T406 -> F120T420
+F239T244 -> F426T436
+F120T420 -> F426T436[label="false"]
+}

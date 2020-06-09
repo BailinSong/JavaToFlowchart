@@ -1,0 +1,6 @@
+
+        if(root == null) return;
+        inOrder(root.left);
+        if(preNode != null) minDiff = Math.min(minDiff, root.val - preNode.val);
+        preNode = root;
+        inOrder(root.right);

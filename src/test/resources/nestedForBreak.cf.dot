@@ -1,0 +1,28 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T203[ shape=box, label="int i = 1", style="filled", fillcolor="white"]
+F56T61[ shape=diamond, label="i \< 10", style="filled", fillcolor="white"]
+F73T177[ shape=box, label="int j = 1", style="filled", fillcolor="white"]
+F89T94[ shape=diamond, label="j \<= i", style="filled", fillcolor="white"]
+F108T125[ shape=diamond, label="j == 5", style="filled", fillcolor="white"]
+F120T125break[ shape=box, label="break;", style="filled", fillcolor="white"]
+F131T173[ shape=box, label="System.out.printf(\"%d*%d=%d\", i, j, i * j);", style="filled", fillcolor="white"]
+F97T99[ shape=box, label="j++", style="filled", fillcolor="white"]
+F181T201[ shape=box, label="System.out.println();", style="filled", fillcolor="white"]
+F64T66[ shape=box, label="i++", style="filled", fillcolor="white"]
+F205T230[ shape=box, label="System.out.println(\"out\");", style="filled", fillcolor="white"]
+F0T0 -> F40T203
+F131T173 -> F97T99
+F181T201 -> F64T66
+F56T61 -> F73T177[label="true"]
+F89T94 -> F108T125[label="true"]
+F108T125 -> F120T125break[label="true"]
+F40T203 -> F56T61
+F73T177 -> F89T94
+F97T99 -> F89T94
+F64T66 -> F56T61
+F120T125break -> F181T201
+F108T125 -> F131T173[label="false"]
+F89T94 -> F181T201[label="false"]
+F56T61 -> F205T230[label="false"]
+}

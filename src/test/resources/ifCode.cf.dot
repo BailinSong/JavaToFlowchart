@@ -1,0 +1,9 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F48T100[ shape=diamond, label="a == 1", style="filled", fillcolor="white"]
+F72T75[ shape=box, label="a++;", style="filled", fillcolor="white"]
+F87T90[ shape=box, label="b++;", style="filled", fillcolor="white"]
+F0T0 -> F48T100
+F72T75 -> F87T90
+F48T100 -> F72T75[label="true"]
+}

@@ -1,0 +1,12 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F44T114[ shape=box, label="Integer integer=list.next()", style="filled", fillcolor="white"]
+F67T70[ shape=diamond, label="integer.isNonNull", style="filled", fillcolor="white"]
+F81T108[ shape=box, label="System.out.println(integer);", style="filled", fillcolor="white"]
+F57T63[ shape=box, label="integer=list.next()", style="filled", fillcolor="white"]
+F0T0 -> F44T114
+F81T108 -> F57T63
+F67T70 -> F81T108[label="true"]
+F44T114 -> F67T70
+F57T63 -> F67T70
+}

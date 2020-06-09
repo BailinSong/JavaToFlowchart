@@ -1,0 +1,22 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F45T88[ shape=box, label="Map\<Integer, Integer\> map = new HashMap\<\>();", style="filled", fillcolor="white"]
+F94T308[ shape=box, label="int i = 0", style="filled", fillcolor="white"]
+F110T124[ shape=diamond, label="i \< nums.length", style="filled", fillcolor="white"]
+F140T183[ shape=box, label="Integer another = map.get(target - nums[i]);", style="filled", fillcolor="white"]
+F191T302[ shape=diamond, label="another == null", style="filled", fillcolor="white"]
+F222T241[ shape=box, label="map.put(nums[i], i);", style="filled", fillcolor="white"]
+F266T294[ shape=ellipse, label="new int[]{another, i}", style="filled", fillcolor="white"]
+F127T129[ shape=box, label="i++", style="filled", fillcolor="white"]
+F314T325[ shape=ellipse, label="null", style="filled", fillcolor="white"]
+F0T0 -> F45T88
+F45T88 -> F94T308
+F140T183 -> F191T302
+F110T124 -> F140T183[label="true"]
+F191T302 -> F222T241[label="true"]
+F191T302 -> F266T294[label="false"]
+F94T308 -> F110T124
+F127T129 -> F110T124
+F110T124 -> F314T325[label="false"]
+F222T241 -> F127T129
+}

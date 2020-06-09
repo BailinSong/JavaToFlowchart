@@ -1,0 +1,18 @@
+digraph G{
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F49T72[ shape=diamond, label="root == null", style="filled", fillcolor="white"]
+F66T72X[ shape=ellipse, label="return;", style="filled", fillcolor="white"]
+F82T100[ shape=box, label="inOrder(root.left);", style="filled", fillcolor="white"]
+F110T181[ shape=diamond, label="preNode != null", style="filled", fillcolor="white"]
+F130T181X[ shape=box, label="minDiff = Math.min(minDiff, root.val - preNode.val);", style="filled", fillcolor="white"]
+F191T205[ shape=box, label="preNode = root;", style="filled", fillcolor="white"]
+F215T234[ shape=box, label="inOrder(root.right);", style="filled", fillcolor="white"]
+F0T0 -> F49T72
+F82T100 -> F110T181
+F130T181X -> F191T205
+F191T205 -> F215T234
+F49T72 -> F66T72X[label="true"]
+F110T181 -> F130T181X[label="true"]
+F49T72 -> F82T100[label="false"]
+F110T181 -> F191T205[label="false"]
+}

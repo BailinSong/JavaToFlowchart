@@ -1,0 +1,16 @@
+if (currSum == target) {
+      ans.add(new ArrayList<>(combination));
+      return;
+    } else if (currSum > target) {
+      return;
+    }
+    for (int i = start; i < candidates.length; i++) {
+      int candidate = candidates[i];
+      combination.add(candidate);
+      currSum += candidate;
+      // not i + 1, because we can reuse element
+      backtracking(ans, combination, currSum, i, candidates, target);
+      combination.remove(combination.size() - 1);
+      currSum -= candidate;
+    }
+
