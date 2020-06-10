@@ -1,0 +1,11 @@
+digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F53T106[ shape=box, label="AtomicLong lastIndex = new AtomicLong(Long.MIN_VALUE);", style="filled", fillcolor="white"]
+F120T829[ shape=box, label="FileProcessers \n                    .build(workFile).setParallel(1).setRowProcess((sheetIndex, curRow, cols) -\> \n            { \n                //标示第一个消息位置 \n                if (firstSheetIndex.get() \> sheetIndex) { \n                    firstSheetIndex.set(sheetIndex); \n                } \n                if (firstIndex.get() \> curRow) { \n                    firstIndex.set(curRow); \n                } \n                //标示最后一个消息位置 \n                if (lastSheetIndex.get() \< sheetIndex) { \n                    lastSheetIndex.set(sheetIndex); \n                } \n                if (lastIndex.get() \< curRow) { \n                    lastIndex.set(curRow); \n                } \n            }).process(workFile.getCanonicalPath());", style="filled", fillcolor="white"]
+F844T927[ shape=box, label="taskStatusService.publishTaskInfo(taskNo,false,ITaskStatusService.STATUS_ANALYZING);", style="filled", fillcolor="white"]
+F0T0 -> F53T106
+F53T106 -> F120T829
+F120T829 -> F844T927
+}

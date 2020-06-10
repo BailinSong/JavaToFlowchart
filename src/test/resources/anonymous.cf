@@ -1,0 +1,22 @@
+
+            AtomicLong lastIndex = new AtomicLong(Long.MIN_VALUE);
+            FileProcessers
+                    .build(workFile).setParallel(1).setRowProcess((sheetIndex, curRow, cols) ->
+            {
+                //标示第一个消息位置
+                if (firstSheetIndex.get() > sheetIndex) {
+                    firstSheetIndex.set(sheetIndex);
+                }
+                if (firstIndex.get() > curRow) {
+                    firstIndex.set(curRow);
+                }
+                //标示最后一个消息位置
+                if (lastSheetIndex.get() < sheetIndex) {
+                    lastSheetIndex.set(sheetIndex);
+                }
+                if (lastIndex.get() < curRow) {
+                    lastIndex.set(curRow);
+                }
+            }).process(workFile.getCanonicalPath());
+
+            taskStatusService.publishTaskInfo(taskNo,false,ITaskStatusService.STATUS_ANALYZING);

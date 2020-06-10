@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F45T67[ shape=box, label="int[] ans = new int[2];", style="filled", fillcolor="white"]
 F73T82[ shape=box, label="int i = 0;", style="filled", fillcolor="white"]
@@ -18,13 +20,13 @@ F73T82 -> F88T114
 F88T114 -> F120T420
 F191T205 -> F215T229
 F215T229 -> F239T244
-F120T420 -> F142T414[label="true"]
-F142T414 -> F191T205[label="true"]
-F142T414 -> F259T414TelseIf[label="false"]
-F259T414TelseIf -> F369T375[label="true"]
-F259T414TelseIf -> F400T406[label="false"]
+F120T420 -> F142T414[label="true", minlen=1]
+F142T414 -> F191T205[label="true", minlen=1]
+F142T414 -> F259T414TelseIf[label="false", minlen=2]
+F259T414TelseIf -> F369T375[label="true", minlen=1]
+F259T414TelseIf -> F400T406[label="false", minlen=2]
 F369T375 -> F120T420
 F400T406 -> F120T420
 F239T244 -> F426T436
-F120T420 -> F426T436[label="false"]
+F120T420 -> F426T436[label="false", minlen=2]
 }

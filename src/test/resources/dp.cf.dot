@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F40T73[ shape=box, label="boolean[] dp = new boolean[N + 1];", style="filled", fillcolor="white"]
 F77T99[ shape=box, label="Arrays.fill(dp, false);", style="filled", fillcolor="white"]
@@ -18,15 +20,15 @@ F40T73 -> F77T99
 F77T99 -> F103T271
 F214T226 -> F236T241
 F261T267 -> F127T129
-F119T124 -> F138T255[label="true"]
-F154T158 -> F174T249[label="true"]
-F174T249 -> F214T226[label="true"]
+F119T124 -> F138T255[label="true", minlen=1]
+F154T158 -> F174T249[label="true", minlen=1]
+F174T249 -> F214T226[label="true", minlen=1]
 F103T271 -> F119T124
 F138T255 -> F154T158
 F161T163 -> F154T158
 F127T129 -> F119T124
 F236T241 -> F261T267
-F174T249 -> F161T163[label="false"]
-F154T158 -> F261T267[label="false"]
-F119T124 -> F274T286[label="false"]
+F174T249 -> F161T163[label="false", minlen=2]
+F154T158 -> F261T267[label="false", minlen=2]
+F119T124 -> F274T286[label="false", minlen=2]
 }

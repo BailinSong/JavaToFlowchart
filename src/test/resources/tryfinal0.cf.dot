@@ -1,0 +1,22 @@
+digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T103[ shape=box, label="long remacthCount = entity.get(General.RE_MATCH_COUNT, 0L) + 1L;", style="filled", fillcolor="white"]
+F114T565[ shape=diamond, label="remacthCount\>5", style="filled", fillcolor="white"]
+F147T518[ shape=diamond, label="ObjectUtil.isNullOrEmpty(entity)", style="filled", fillcolor="white"]
+F249T307[ shape=box, label="noMatch.info(\"{}\",objectMapper.writeValueAsString(entity));", style="filled", fillcolor="white"]
+F532T555[ shape=ellipse, label="\"RE_MATCH_LIMIT\"", style="filled", fillcolor="white"]
+F576T624[ shape=box, label="entity.set(General.RE_MATCH_COUNT, remacthCount);", style="filled", fillcolor="white"]
+F635T667[ shape=box, label="rematchReportService.add(entity);", style="filled", fillcolor="white"]
+F678T687[ shape=ellipse, label="\"\"", style="filled", fillcolor="white"]
+F0T0 -> F40T103
+F40T103 -> F114T565
+F249T307 -> F532T555
+F576T624 -> F635T667
+F635T667 -> F678T687
+F114T565 -> F147T518[label="true", minlen=1]
+F147T518 -> F249T307[label="true", minlen=1]
+F147T518 -> F532T555[label="false", minlen=2]
+F114T565 -> F576T624[label="false", minlen=2]
+}

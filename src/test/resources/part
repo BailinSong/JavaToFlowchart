@@ -1,0 +1,44 @@
+Message message = new Message();
+                            message.set(Message.DATAS, cols);
+                            message.set(Message.TYPE, "MESSAGE");
+                            message.set(TASK_NO, taskNo);
+                            message.set(Message.BRANCH_NO, task.getCreateBranch().getBranchNo());
+                            message.set(Message.USER_ID, task.getCreateUser().getUserId());
+
+
+                            message.set(Message.TOTAL_STAGE, (long) business.getSendPolicy().getSendStepList().size());
+                            message.set(Message.LINE_NO, (long) curRow);
+
+//                            message.set(Message.IMMEDIATELY, task.getImmediateExeFlag());
+
+                            //设置消息ID 消息id为 任务NO+阶段+行号
+                            message.set(Message.MESSASGE_ID, Message.getMessageID(message, timeIndex));
+
+                            message.set(PROGRESS, true);
+
+                            //生成消息阶段信息
+                            messageStageService.createMessageStatus(message, message.get(Message.MESSASGE_ID),
+                                    message.get(Message.TOTAL_STAGE, 1L), message.get(Message.STAGE, 1L));
+                            //设置消息阶段为0,消息发送流程根据此值判定选取那个阶段的模版组
+//                            message.set(Message.STAGE, 1L);
+
+                            message.set(Message.QUERY_KEY, ObjectUtil.requireNotEqualElseGet(task.getQueryKey(), -1, () -> task.getBusiness().getQueryKey()));
+
+
+                            //为消息飙戏MARK属性
+                            if(sheetIndex==firstSheetIndex.get()&& curRow==firstIndex.get()){
+                                message.set(MARK,"B:"+(curRow));
+                            }
+
+                            if(sheetIndex==lastSheetIndex.get()&& curRow>=lastIndex.get()){
+                                message.set(MARK,"E:"+(curRow));
+                            }
+
+                            //成效消息详单
+                            detailService.message(message);
+
+                            //发送消息
+                            cedfService.publishEvent(messageSendEvent, message);
+
+                            //设置任务状态缓存
+                            taskStatusService.incrementTaskInfo(taskNo, ITaskStatusService.ANALYZE_SUCCESS);

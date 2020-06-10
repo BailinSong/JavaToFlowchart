@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F40T185[ shape=diamond, label="prev != null", style="filled", fillcolor="white"]
 F62T91[ shape=box, label="prev.stops.addLink(cur.start);", style="filled", fillcolor="white"]
@@ -10,8 +12,8 @@ F0T0 -> F40T185
 F62T91 -> F95T169
 F122T165 -> F173T183
 F173T183 -> F187T206
-F40T185 -> F62T91[label="true"]
-F95T169 -> F122T165[label="true"]
-F95T169 -> F173T183[label="false"]
-F40T185 -> F187T206[label="false"]
+F40T185 -> F62T91[label="true", minlen=1]
+F95T169 -> F122T165[label="true", minlen=1]
+F95T169 -> F173T183[label="false", minlen=2]
+F40T185 -> F187T206[label="false", minlen=2]
 }

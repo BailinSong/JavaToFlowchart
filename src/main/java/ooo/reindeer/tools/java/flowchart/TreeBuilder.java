@@ -433,11 +433,16 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
 
     @Override
     public TreeNode visitTryStatement(Java8Parser.TryStatementContext ctx) {
-        stack.removeElement(stack.lastElement());
-        root.getSub().removeIf(treeNode -> treeNode.getId().equals(getID(ctx)));
 
 
-        return super.visitBlock(ctx.block());
+
+        if(ctx.block()!=null) {
+            stack.removeElement(stack.lastElement());
+            root.removeFirst(getID(ctx));
+            return super.visitBlock(ctx.block());
+        }else{
+            return visitTryWithResourcesStatement(ctx.tryWithResourcesStatement());
+        }
     }
 /*
     Node findRealParent(ParserRuleContext ctx) {
@@ -472,7 +477,7 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
     @Override
     public TreeNode visitTryWithResourcesStatement(Java8Parser.TryWithResourcesStatementContext ctx) {
         stack.removeElement(stack.lastElement());
-        root.getSub().removeIf(treeNode -> treeNode.getId().equals(getID(ctx)));
+        root.removeFirst(getID(ctx));
         return super.visitBlock(ctx.block());
     }
 
@@ -500,4 +505,17 @@ public class TreeBuilder extends Java8ParserBaseVisitor<TreeNode> {
         return result;
     }
 
+
+    @Override
+    public TreeNode visitLambdaBody(Java8Parser.LambdaBodyContext ctx) {
+
+
+
+//        System.out.println("ctx.getText() = " + ctx.getText());
+//        Interval interval = Interval.of(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex());
+//        TreeNode temp = TreeNode.builder().id(getID(ctx)).text("lambada").type("Lambada").interval(interval).build();
+//        record(temp, interval);
+//        return super.visitLambdaBody(ctx);
+        return root;
+    }
 }

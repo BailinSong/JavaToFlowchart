@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F52T309[ shape=diamond, label="score \>= 90", style="filled", fillcolor="white"]
 F85T105[ shape=box, label="println(\"excellent\");", style="filled", fillcolor="white"]
@@ -8,10 +10,10 @@ F196T309TelseIf[ shape=diamond, label="score \>= 60", style="filled", fillcolor=
 F228T244[ shape=box, label="println(\"so so\");", style="filled", fillcolor="white"]
 F281T295[ shape=box, label="println(\"bad\");", style="filled", fillcolor="white"]
 F0T0 -> F52T309
-F52T309 -> F85T105[label="true"]
-F52T309 -> F126T309TelseIf[label="false"]
-F126T309TelseIf -> F159T175[label="true"]
-F126T309TelseIf -> F196T309TelseIf[label="false"]
-F196T309TelseIf -> F228T244[label="true"]
-F196T309TelseIf -> F281T295[label="false"]
+F52T309 -> F85T105[label="true", minlen=1]
+F52T309 -> F126T309TelseIf[label="false", minlen=2]
+F126T309TelseIf -> F159T175[label="true", minlen=1]
+F126T309TelseIf -> F196T309TelseIf[label="false", minlen=2]
+F196T309TelseIf -> F228T244[label="true", minlen=1]
+F196T309TelseIf -> F281T295[label="false", minlen=2]
 }

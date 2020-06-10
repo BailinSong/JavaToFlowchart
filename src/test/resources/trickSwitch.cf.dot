@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F40T45[ shape=box, label="int a;", style="filled", fillcolor="white"]
 F47T218[ shape=diamond, label="type", style="filled", fillcolor="white"]
@@ -15,12 +17,12 @@ F40T45 -> F47T218
 F134T139 -> F145T150
 F167T172 -> F178T183
 F200T205 -> F211T216
-F47T218 -> F82T87[label="DOWHILE"]
+F47T218 -> F82T87[label="DOWHILE", minlen=1]
 F82T87 -> F134T139
-F47T218 -> F134T139[label="FOR"]
-F47T218 -> F134T139[label="WHILE"]
-F47T218 -> F167T172[label="IF"]
-F47T218 -> F200T205[label="default"]
+F47T218 -> F134T139[label="FOR", minlen=2]
+F47T218 -> F134T139[label="WHILE", minlen=3]
+F47T218 -> F167T172[label="IF", minlen=4]
+F47T218 -> F200T205[label="default", minlen=5]
 F145T150 -> F220T230
 F178T183 -> F220T230
 F211T216 -> F220T230

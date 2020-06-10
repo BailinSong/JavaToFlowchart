@@ -1,0 +1,19 @@
+long remacthCount = entity.get(General.RE_MATCH_COUNT, 0L) + 1L;
+
+        if(remacthCount>5) {
+            if(ObjectUtil.isNullOrEmpty(entity)){
+                try (File file=new file()){
+                    noMatch.info("{}",objectMapper.writeValueAsString(entity));
+                } catch (JsonProcessingException e) {
+                    logger.warn("no match report log {}",entity);
+                    logger.warn("no match report log ",e);
+                }
+            }
+            return "RE_MATCH_LIMIT";
+        }
+
+        entity.set(General.RE_MATCH_COUNT, remacthCount);
+
+        rematchReportService.add(entity);
+
+        return "";

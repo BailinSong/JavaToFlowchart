@@ -1,7 +1,9 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F40T54[ shape=diamond, label="a == 1", style="filled", fillcolor="white"]
 F56T59[ shape=box, label="c++;", style="filled", fillcolor="white"]
 F0T0 -> F40T54
-F40T54 -> F56T59[label="false"]
+F40T54 -> F56T59[label="false", minlen=1]
 }

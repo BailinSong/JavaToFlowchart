@@ -1,0 +1,9 @@
+int a=0;
+try{
+    dosome1();
+    dosome2();
+    dosome3();
+}catch(Error e){
+    e.tostring();
+}
+return 0;

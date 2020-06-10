@@ -1,10 +1,14 @@
 package ooo.reindeer.tools.java.flowchart;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
 /**
+ * 点构造器
+ *
  * @ClassName MermaidBuilder
  * @Author songbailin
  * @Date 2020/6/3 00:27
@@ -13,6 +17,9 @@ import java.util.function.Function;
  */
 public class DotBuilder extends FlowchartBuilder {
 
+    /**
+     * 点构造器
+     */
     public DotBuilder() {
         super();
         super.setNodeText(new Function<Node, String>() {
@@ -31,29 +38,40 @@ public class DotBuilder extends FlowchartBuilder {
                 return text
                         .replaceAll("\"", "\\\\\"")
                         .replaceAll("<", "\\\\<")
-                        .replaceAll("\r\n", " ")
-                        .replaceAll("\n\r", " ")
-                        .replaceAll("\r", " ")
-                        .replaceAll("\n", " ")
+                        .replaceAll("\r", " \\\\r")
+                        .replaceAll("\n", " \\\\n")
                         .replaceAll(">", "\\\\>");
             }
         });
 
         super.setRelationText(new Function<Relation, String>() {
+
+            Map<String,Integer> minlenMap=new HashMap<>();
+            int minle=1;
             @Override
             public String apply(Relation relation) {
                 if (Objects.isNull(relation.getCondition()) || relation.getCondition().toString().isEmpty()) {
                     return "F" + relation.getFrom().toString().replace('_', 'T') + " -> " + "F" + relation.getTo().toString().replace('_', 'T');
                 } else {
-                    return "F" + relation.getFrom().toString().replace('_', 'T') + " -> " + "F" + relation.getTo().toString().replace('_', 'T') + "[label=\"" + relation.getCondition() + "\"]";
+                    return "F" + relation.getFrom().toString().replace('_', 'T') + " -> " + "F" + relation.getTo().toString().replace('_', 'T') + "[label=\"" + relation.getCondition() + "\", minlen="+minlenMap.computeIfAbsent(relation.getCondition().toString(),s -> minle++)+"]";
                 }
             }
         });
     }
 
+    /**
+     * builder字符串
+     *
+     * @param nodes
+     *         节点
+     * @param relationList
+     *         关系列表
+     *
+     * @return {@link StringBuilder}
+     */
     @Override
     public StringBuilder builderString(List<Node> nodes, List<Relation> relationList) {
-        StringBuilder stringBuilder = new StringBuilder("digraph G{\n");
+        StringBuilder stringBuilder = new StringBuilder("digraph G{\nranksep = 0.1;\nnodesep = 0.1;\n");
         nodes.forEach(node -> stringBuilder.append(node.nodeText()).append("\n"));
         relationList.forEach(relation -> stringBuilder.append(relation.relationText()).append("\n"));
         stringBuilder.append("}\n");

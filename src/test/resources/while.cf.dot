@@ -1,10 +1,12 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F40T64[ shape=diamond, label="a \< 10", style="filled", fillcolor="white"]
 F59T62[ shape=box, label="a++;", style="filled", fillcolor="white"]
 F66T76[ shape=box, label="println(a);", style="filled", fillcolor="white"]
 F0T0 -> F40T64
-F40T64 -> F59T62[label="true"]
+F40T64 -> F59T62[label="true", minlen=1]
 F59T62 -> F40T64
-F40T64 -> F66T76[label="false"]
+F40T64 -> F66T76[label="false", minlen=2]
 }

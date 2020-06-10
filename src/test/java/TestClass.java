@@ -78,14 +78,28 @@ public class TestClass {
 
         force = true;
         reBuildSample=true;
-        String cfString = "paper-5-5";
+        String cfString = "anonymous.cf";
         TreeNode tree = TreeBuilder.parseString(load(cfString));
         System.out.println("tree = " + tree);
         FlowchartBuilder flowchartBuilder = new DotBuilder();
         flowchartBuilder.setDebug(true);
         String r = flowchartBuilder.builder(tree);
-        saveDot(cfString, r);
+//        saveDot(cfString, r);
 
+        System.out.println(r);
+    }
+
+    @Test
+    public void testSingle() throws IOException {
+
+        force = true;
+        reBuildSample=true;
+        String cfString = "/Users/songbailin/IdeaProjects/back-service-1.0.0/src/main/java/com/wisdom/ucp/back/flow/report/GenerateRematchReport.java";
+        TreeNode tree = TreeBuilder.parseFile(cfString,"exec");
+        FlowchartBuilder flowchartBuilder = new DotBuilder();
+//        flowchartBuilder.setDebug(true);
+        String r = flowchartBuilder.builder(tree);
+//        saveDot(cfString, r)
         System.out.println(r);
     }
 

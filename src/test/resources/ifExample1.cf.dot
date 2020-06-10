@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F54T487[ shape=diamond, label="prev != null", style="filled", fillcolor="white"]
 F90T119[ shape=box, label="prev.stops.addLink(cur.start);", style="filled", fillcolor="white"]
@@ -14,12 +16,12 @@ F0T0 -> F54T487
 F90T119 -> F137T380
 F344T362 -> F398T408
 F449T471 -> F503T522
-F54T487 -> F90T119[label="true"]
-F54T487 -> F449T471[label="false"]
-F137T380 -> F178T221[label="true"]
-F137T380 -> F246T380TelseIf[label="false"]
-F246T380TelseIf -> F287T299[label="true"]
-F246T380TelseIf -> F344T362[label="false"]
+F54T487 -> F90T119[label="true", minlen=1]
+F54T487 -> F449T471[label="false", minlen=2]
+F137T380 -> F178T221[label="true", minlen=1]
+F137T380 -> F246T380TelseIf[label="false", minlen=2]
+F246T380TelseIf -> F287T299[label="true", minlen=1]
+F246T380TelseIf -> F344T362[label="false", minlen=2]
 F178T221 -> F398T408
 F287T299 -> F398T408
 F398T408 -> F503T522

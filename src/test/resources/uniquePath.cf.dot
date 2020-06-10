@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F45T75[ shape=diamond, label="m == 0 || n == 0", style="filled", fillcolor="white"]
 F67T75X[ shape=ellipse, label="return 0;", style="filled", fillcolor="white"]
@@ -24,22 +26,22 @@ F117T143 -> F149T161
 F149T161 -> F167T421
 F317T329 -> F341T349
 F369T407 -> F226T228
-F45T75 -> F67T75X[label="true"]
-F81T111 -> F103T111X[label="true"]
-F183T187 -> F203T415[label="true"]
-F219T223 -> F241T359[label="true"]
-F241T359 -> F275T305[label="true"]
-F275T305 -> F297T305continue[label="true"]
+F45T75 -> F67T75X[label="true", minlen=1]
+F81T111 -> F103T111X[label="true", minlen=1]
+F183T187 -> F203T415[label="true", minlen=1]
+F219T223 -> F241T359[label="true", minlen=1]
+F241T359 -> F275T305[label="true", minlen=1]
+F275T305 -> F297T305continue[label="true", minlen=1]
 F167T421 -> F183T187
 F203T415 -> F219T223
 F226T228 -> F219T223
 F190T192 -> F183T187
 F297T305continue -> F226T228
 F341T349 -> F226T228
-F45T75 -> F81T111[label="false"]
-F81T111 -> F117T143[label="false"]
-F275T305 -> F317T329[label="false"]
-F241T359 -> F369T407[label="false"]
-F219T223 -> F190T192[label="false"]
-F183T187 -> F427T450[label="false"]
+F45T75 -> F81T111[label="false", minlen=2]
+F81T111 -> F117T143[label="false", minlen=2]
+F275T305 -> F317T329[label="false", minlen=2]
+F241T359 -> F369T407[label="false", minlen=2]
+F219T223 -> F190T192[label="false", minlen=2]
+F183T187 -> F427T450[label="false", minlen=2]
 }

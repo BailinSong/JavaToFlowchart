@@ -21,33 +21,67 @@ import static ooo.reindeer.tools.java.flowchart.TreeBuilder.*;
  */
 public abstract class FlowchartBuilder {
 
+    /**
+     * 调试
+     */
     @Setter
     @Getter
     boolean debug = false;
 
+    /**
+     * 自动结束节点
+     */
     @Setter
     @Getter
     boolean autoEndNode=false;
 
+    /**
+     * 节点
+     */
     List<Node> nodes = new ArrayList<>();
+    /**
+     * 关系列表
+     */
     List<Relation> relationList = new ArrayList<>();
 
+    /**
+     * 文本的关系
+     */
     @Getter
     @Setter
     Function<Relation, String> relationText = null;
 
+    /**
+     * 节点的文本
+     */
     @Getter
     @Setter
     Function<Node, String> nodeText = null;
 
 
+    /**
+     * 忽略
+     */
     List<String> ignore = Arrays.asList(CONDITION, WHILE, SWITCH_END, CASE);//,"while"
 
+    /**
+     * 附加调试标记
+     *
+     * @param tag
+     *         标签
+     *
+     * @return {@link String}
+     */
     String appendDebugTag(String tag) {
         return (debug) ? "_" + tag : "";
     }
 
-    //块结尾关系补偿
+    /**
+     * 构建块尾巴关系
+     *
+     * @param root
+     *         根
+     *///块结尾关系补偿
     private void buildBlockTailRelations(TreeNode root) {
         root.walk(tn -> {
             if (tn.getPrevious() != null && (IF.equalsIgnoreCase(tn.getPrevious().getType()))) {
@@ -85,6 +119,12 @@ public abstract class FlowchartBuilder {
 
     }
 
+    /**
+     * 建立破坏的关系
+     *
+     * @param treeNode
+     *         树节点
+     */
     private void buildBreakRelations(TreeNode treeNode) {
         treeNode.walk(treeNode1 -> {
             if (treeNode1.getType().equals(BREAK)) {
@@ -118,6 +158,12 @@ public abstract class FlowchartBuilder {
         });
     }
 
+    /**
+     * 建立持续的关系
+     *
+     * @param treeNode
+     *         树节点
+     */
     private void buildContinueRelations(TreeNode treeNode) {
         treeNode.walk(treeNode1 -> {
             if (treeNode1.getType().equals(CONTINUE)) {
@@ -141,7 +187,12 @@ public abstract class FlowchartBuilder {
         });
     }
 
-    //创建直接关系
+    /**
+     * 建立直接的关系
+     *
+     * @param root
+     *         根
+     *///创建直接关系
     private void buildDirectRelations(TreeNode root) {
         AtomicReference<TreeNode> ptn = new AtomicReference<>(root);
 
@@ -175,7 +226,12 @@ public abstract class FlowchartBuilder {
         });
     }
 
-    //创建For块关系
+    /**
+     * 建立关系
+     *
+     * @param root
+     *         根
+     *///创建For块关系
     private void buildForRelations(TreeNode root) {
 
         AtomicReference<TreeNode> ptn = new AtomicReference<>(root);
@@ -209,7 +265,12 @@ public abstract class FlowchartBuilder {
 
     }
 
-    //if块默认关系补偿
+    /**
+     * 如果默认条件关系建立
+     *
+     * @param root
+     *         根
+     *///if块默认关系补偿
     private void buildIfDefaultConditionalRelations(TreeNode root) {
         root.walk(treeNode -> {
 
@@ -274,7 +335,12 @@ public abstract class FlowchartBuilder {
         });
     }
 
-    //创建IF块关系
+    /**
+     * 如果关系构建
+     *
+     * @param root
+     *         根
+     *///创建IF块关系
     private void buildIfRelations(TreeNode root) {
 
         root.walk(treeNode -> {
@@ -307,6 +373,12 @@ public abstract class FlowchartBuilder {
         });
     }
 
+    /**
+     * 构建scase关系
+     *
+     * @param treeNode
+     *         树节点
+     */
     protected void buildSCaseRelations(TreeNode treeNode) {
 
         List<TreeNode> caseList = new ArrayList<>();
@@ -331,13 +403,17 @@ public abstract class FlowchartBuilder {
                         }
                         if (!(treeNode1.getSub().get(i).getType().equals(BREAK) || treeNode1.getSub().get(i).getType().equals(IF))) {
                             TreeNode fnn = treeNode1.getSub().get(i).findeNearNext();
-                            while ((fnn.getType().equals(CASE) || fnn.getType().equals(SWITCH_END))) {
+                            while (fnn!=null&&(fnn.getType().equals(CASE) || fnn.getType().equals(SWITCH_END))) {
                                 fnn = fnn.findeNearNext();
+
+                                if(fnn==null) {
+                                    break;
+                                }
 
                                 if (fnn.getType().equals(WHILE)) {
                                     fnn = getRealNode(fnn.getParent());
                                 }
-                                if(!(fnn.getType().equals(CASE) || fnn.getType().equals(SWITCH_END))) {
+                                if(!(fnn.getType().equals(CASE) || fnn.getType().equals(SWITCH_END)||treeNode1.getSub().get(i).getType().equals(RETURN))) {
                                     Relation merge = Relation.builder().from(treeNode1.getSub().get(i).getId()).to(fnn.getId()).condition(appendDebugTag("BSCR.2")).converter(relationText
                                     ).build();
                                     relationList.add(merge);
@@ -360,6 +436,12 @@ public abstract class FlowchartBuilder {
 
     }
 
+    /**
+     * 建立在关系
+     *
+     * @param treeNode
+     *         树节点
+     */
     private void buildWhileRelations(TreeNode treeNode) {
 
         treeNode.walk(tn -> {
@@ -389,6 +471,14 @@ public abstract class FlowchartBuilder {
         });
     }
 
+    /**
+     * 构建器
+     *
+     * @param treeNode
+     *         树节点
+     *
+     * @return {@link String}
+     */
     public String builder(TreeNode treeNode) {
         initNodes(treeNode);
         initRelation(treeNode);
@@ -398,8 +488,24 @@ public abstract class FlowchartBuilder {
         return s.toString();
     }
 
+    /**
+     * builder字符串
+     *
+     * @param nodes
+     *         节点
+     * @param relationList
+     *         关系列表
+     *
+     * @return {@link StringBuilder}
+     */
     public abstract StringBuilder builderString(List<Node> nodes, List<Relation> relationList);
 
+    /**
+     * 创建节点
+     *
+     * @param tn
+     *         tn
+     */
     private void
     createNode(TreeNode tn) {
 
@@ -410,6 +516,14 @@ public abstract class FlowchartBuilder {
         }
     }
 
+    /**
+     * 获得真正的节点
+     *
+     * @param tn
+     *         tn
+     *
+     * @return {@link TreeNode}
+     */
     TreeNode getRealNode(TreeNode tn) {
         if (tn.getType().equals(CONDITION)) {
             return tn.getParent();
@@ -418,6 +532,14 @@ public abstract class FlowchartBuilder {
         }
     }
 
+    /**
+     * 如果阻止其他
+     *
+     * @param rpn
+     *         项
+     *
+     * @return boolean
+     */
     private boolean ifBlockHasElse(TreeNode rpn) {
         boolean hasFalse = false;
 
@@ -427,6 +549,14 @@ public abstract class FlowchartBuilder {
         return hasFalse;
     }
 
+    /**
+     * 如果块真正的
+     *
+     * @param rpn
+     *         项
+     *
+     * @return boolean
+     */
     private boolean ifBlockHasTrue(TreeNode rpn) {
         boolean hasFalse = false;
 
@@ -436,11 +566,23 @@ public abstract class FlowchartBuilder {
         return hasFalse;
     }
 
+    /**
+     * 初始化节点
+     *
+     * @param treeNode
+     *         树节点
+     */
     private void initNodes(TreeNode treeNode) {
 
         TreeNode.walk(treeNode, this::createNode);
     }
 
+    /**
+     * 初始化的关系
+     *
+     * @param treeNode
+     *         树节点
+     */
     private void initRelation(TreeNode treeNode) {
         buildDirectRelations(treeNode);
         buildIfRelations(treeNode);
@@ -457,6 +599,12 @@ public abstract class FlowchartBuilder {
         }
     }
 
+    /**
+     * 建立最终的关系
+     *
+     * @param treeNode
+     *         树节点
+     */
     private void buildEndRelations(TreeNode treeNode) {
         boolean needEndNode=false;
         TreeNode endNode = TreeNode.builder().id(END).text(END).type(END).build();

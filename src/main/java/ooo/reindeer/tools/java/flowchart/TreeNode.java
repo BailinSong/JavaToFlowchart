@@ -53,14 +53,7 @@ public class TreeNode {
     @Builder.Default()
     private List<TreeNode> sub = new ArrayList<>();
 
-    public static void walk(TreeNode root, Consumer<TreeNode> action) {
-        action.accept(root);
-        if (root.sub.size() > 0) {
-            for (TreeNode treeNode : root.sub) {
-                walk(treeNode, action);
-            }
-        }
-    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -146,5 +139,26 @@ public class TreeNode {
         for (TreeNode treeNode : this.getSub()) {
             walk(treeNode, action);
         }
+    }
+
+    public static void walk(TreeNode root, Consumer<TreeNode> action) {
+        action.accept(root);
+        if (root.sub.size() > 0) {
+            for (TreeNode treeNode : root.sub) {
+                walk(treeNode, action);
+            }
+        }
+    }
+    public void removeFirst(Object id){
+        boolean removeIt;
+        for (TreeNode treeNode : this.getSub()) {
+            if(treeNode.getId().equals(id)){
+                removeIt=true;
+                break;
+            }else{
+                treeNode.removeFirst(id);
+            }
+        }
+        this.getSub().removeIf(treeNode -> treeNode.getId().equals(id));
     }
 }

@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F45T88[ shape=box, label="Map\<Integer, Integer\> map = new HashMap\<\>();", style="filled", fillcolor="white"]
 F94T308[ shape=box, label="int i = 0", style="filled", fillcolor="white"]
@@ -12,11 +14,11 @@ F314T325[ shape=ellipse, label="null", style="filled", fillcolor="white"]
 F0T0 -> F45T88
 F45T88 -> F94T308
 F140T183 -> F191T302
-F110T124 -> F140T183[label="true"]
-F191T302 -> F222T241[label="true"]
-F191T302 -> F266T294[label="false"]
+F110T124 -> F140T183[label="true", minlen=1]
+F191T302 -> F222T241[label="true", minlen=1]
+F191T302 -> F266T294[label="false", minlen=2]
 F94T308 -> F110T124
 F127T129 -> F110T124
-F110T124 -> F314T325[label="false"]
+F110T124 -> F314T325[label="false", minlen=2]
 F222T241 -> F127T129
 }

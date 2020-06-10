@@ -1,4 +1,6 @@
 digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
 F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
 F40T177[ shape=diamond, label="currSum == target", style="filled", fillcolor="white"]
 F71T108[ shape=box, label="ans.add(new ArrayList\<\>(combination));", style="filled", fillcolor="white"]
@@ -22,11 +24,11 @@ F310T330 -> F387T449
 F387T449 -> F457T499
 F457T499 -> F507T527
 F507T527 -> F226T228
-F40T177 -> F71T108[label="true"]
-F40T177 -> F135T177TelseIf[label="false"]
-F135T177TelseIf -> F165T171[label="true"]
-F203T223 -> F239T268[label="true"]
+F40T177 -> F71T108[label="true", minlen=1]
+F40T177 -> F135T177TelseIf[label="false", minlen=2]
+F135T177TelseIf -> F165T171[label="true", minlen=1]
+F203T223 -> F239T268[label="true", minlen=1]
 F183T533 -> F203T223
 F226T228 -> F203T223
-F135T177TelseIf -> F183T533[label="false"]
+F135T177TelseIf -> F183T533[label="false", minlen=2]
 }

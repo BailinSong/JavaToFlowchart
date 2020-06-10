@@ -1,0 +1,15 @@
+digraph G{
+ranksep = 0.1;
+nodesep = 0.1;
+F0T0[ shape=ellipse, label="begin", style="filled", fillcolor="white"]
+F40T47[ shape=box, label="int a=0;", style="filled", fillcolor="white"]
+F58T67[ shape=box, label="dosome1();", style="filled", fillcolor="white"]
+F73T82[ shape=box, label="dosome2();", style="filled", fillcolor="white"]
+F88T97[ shape=box, label="dosome3();", style="filled", fillcolor="white"]
+F136T144[ shape=ellipse, label="0", style="filled", fillcolor="white"]
+F0T0 -> F40T47
+F40T47 -> F58T67
+F58T67 -> F73T82
+F73T82 -> F88T97
+F88T97 -> F136T144
+}
