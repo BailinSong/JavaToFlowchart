@@ -77,7 +77,7 @@ public abstract class FlowchartBuilder {
     }
 
     /**
-     * 构建块尾巴关系
+     * 构建块尾巴关系x
      *
      * @param root
      *         根
@@ -471,6 +471,34 @@ public abstract class FlowchartBuilder {
         });
     }
 
+    private void buildDoRelations(TreeNode treeNode){
+//        treeNode.walk(tn -> {
+//
+//            if (tn.getType().equals(IF)
+//                    || tn.getType().equals(CONDITION)
+//                    || tn.getType().equals(BREAK)
+//                    || tn.getType().equals(CONTINUE)
+//                    || tn.getType().equals(RETURN)
+//                    || tn.getType().equals(SWITCH_END)
+//                    || tn.getType().equals(SWITCH)) {
+//                return;
+//            }
+//
+//            TreeNode fnn = tn.findeNearNext();
+////            while (fnn!=null&&(fnn.getType().equals(CONDITION)||fnn.getType().equals(IF))){
+//            while (fnn != null && (fnn.getType().equals(CONDITION))) {
+//                fnn = fnn.findeNearNext();
+//            }
+//            if (fnn != null && fnn.getType().equals(WHILE)) {
+//
+//                Relation merge = Relation.builder().from(tn.getId()).to(getRealNode(fnn.parent).getId()).condition(appendDebugTag("BWR")).converter(relationText
+//                ).build();
+//                relationList.add(merge);
+//            }
+//
+//        });
+    }
+
     /**
      * 构建器
      *
@@ -588,7 +616,7 @@ public abstract class FlowchartBuilder {
         buildIfRelations(treeNode);
         buildForRelations(treeNode);
         buildSCaseRelations(treeNode);
-//        buildDoRelations(treeNode);
+        buildDoRelations(treeNode);
         buildWhileRelations(treeNode);
         buildBreakRelations(treeNode);
         buildContinueRelations(treeNode);
@@ -598,6 +626,9 @@ public abstract class FlowchartBuilder {
             buildEndRelations(treeNode);
         }
     }
+
+
+
 
     /**
      * 建立最终的关系

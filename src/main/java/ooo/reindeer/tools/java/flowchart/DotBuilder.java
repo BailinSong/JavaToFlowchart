@@ -25,12 +25,24 @@ public class DotBuilder extends FlowchartBuilder {
         super.setNodeText(new Function<Node, String>() {
             @Override
             public String apply(Node node) {
-                if (TreeBuilder.RETURN.equalsIgnoreCase(node.getType()) || TreeBuilder.BEGIN.equalsIgnoreCase(node.getType())|| TreeBuilder.END.equalsIgnoreCase(node.getType())) {
-                    return "F" + node.getId().replace('_', 'T') + "[ shape=ellipse, label=\"" + toSafeText(node.getText()) + "\", style=\"filled\", fillcolor=\"white\"]";
-                } else if (node.getType().equalsIgnoreCase("if") || node.getType().equalsIgnoreCase("switch")) {
-                    return "F" + node.getId().replace('_', 'T') + "[ shape=diamond, label=\"" + toSafeText(node.getText()) + "\", style=\"filled\", fillcolor=\"white\"]";
-                } else {
-                    return "F" + node.getId().replace('_', 'T') + "[ shape=box, label=\"" + toSafeText(node.getText()) + "\", style=\"filled\", fillcolor=\"white\"]";
+
+                if(node.getText().startsWith("<<TABLE>")){
+                    if (TreeBuilder.RETURN.equalsIgnoreCase(node.getType()) || TreeBuilder.BEGIN.equalsIgnoreCase(node.getType()) || TreeBuilder.END.equalsIgnoreCase(node.getType())) {
+                        return "F" + node.getId().replace('_', 'T') + "[ label=" + node.getText() + ", style=\"filled\", fillcolor=\"white\"]";
+                    } else if (node.getType().equalsIgnoreCase("if") || node.getType().equalsIgnoreCase("switch")) {
+                        return "F" + node.getId().replace('_', 'T') + "[ label=" + node.getText() + ", style=\"filled\", fillcolor=\"white\"]";
+                    } else {
+                        return "F" + node.getId().replace('_', 'T') + "[ label=" + node.getText() + ", style=\"filled\", fillcolor=\"white\"]";
+                    }
+                }else {
+
+                    if (TreeBuilder.RETURN.equalsIgnoreCase(node.getType()) || TreeBuilder.BEGIN.equalsIgnoreCase(node.getType()) || TreeBuilder.END.equalsIgnoreCase(node.getType())) {
+                        return "F" + node.getId().replace('_', 'T') + "[ shape=ellipse, label=\"" + toSafeText(node.getText()) + "\", style=\"filled\", fillcolor=\"white\"]";
+                    } else if (node.getType().equalsIgnoreCase("if") || node.getType().equalsIgnoreCase("switch")) {
+                        return "F" + node.getId().replace('_', 'T') + "[ shape=diamond, label=\"" + toSafeText(node.getText()) + "\", style=\"filled\", fillcolor=\"white\"]";
+                    } else {
+                        return "F" + node.getId().replace('_', 'T') + "[ shape=box, label=\"" + toSafeText(node.getText()) + "\", style=\"filled\", fillcolor=\"white\"]";
+                    }
                 }
             }
 

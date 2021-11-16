@@ -90,12 +90,12 @@ public class TestClass {
     }
 
     @Test
-    public void testSingle() throws IOException {
+    public void testFile() throws IOException {
 
-        force = true;
+//        force = true;
         reBuildSample=true;
-        String cfString = "/Users/songbailin/IdeaProjects/back-service-1.0.0/src/main/java/com/wisdom/ucp/back/flow/report/GenerateRematchReport.java";
-        TreeNode tree = TreeBuilder.parseFile(cfString,"exec");
+        String cfString = "/Users/songbailin/IdeaProjects/queue/component-queue-priority/src/main/java/com/wisdom/ucp/component/queue/impl/priority/MessageQueue.java";
+        TreeNode tree = TreeBuilder.parseFile(cfString,"poll");
         FlowchartBuilder flowchartBuilder = new DotBuilder();
 //        flowchartBuilder.setDebug(true);
         String r = flowchartBuilder.builder(tree);
@@ -103,6 +103,49 @@ public class TestClass {
         System.out.println(r);
     }
 
+    @Test
+    public void testPart() throws IOException {
+
+//        force = true;
+        reBuildSample=true;
+        String cfString =
+                "server.createContext(\"/\", exchange -> {\n" +
+                        "            System.out.println(\"HttpPath = \" + exchange.getRequestURI().getPath());\n" +
+                        "            if (exchange.getRequestURI().getPath().isEmpty() || exchange.getRequestURI().getPath().equals(\"/\")) {\n" +
+                        "                sendData(staticPath + \"/index.html\", exchange);\n" +
+                        "            } else if (exchange.getRequestURI().getPath().equals(\"/api/parse/part/\")) {\n" +
+                        "                if (exchange.getRequestMethod().equalsIgnoreCase(\"POST\")) {\n" +
+                        "\n" +
+                        "                    exchange.getResponseHeaders().set(\"Content-Type\", \"text/plain;charset=utf-8\");\n" +
+                        "\n" +
+                        "                    String postString = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);\n" +
+                        "\n" +
+                        "                    TreeNode tree = TreeBuilder.parseString(postString);\n" +
+                        "                    FlowchartBuilder flowchartBuilder = new DotBuilder();\n" +
+                        "                    String r = flowchartBuilder.builder(tree);\n" +
+                        "\n" +
+                        "                    System.out.println(\"code = \" + postString + \"\\nr = [\" + r + \"]\");\n" +
+                        "\n" +
+                        "                    exchange.sendResponseHeaders(200, r.getBytes(StandardCharsets.UTF_8).length);\n" +
+                        "                    exchange.getResponseBody().write(r.getBytes(StandardCharsets.UTF_8));\n" +
+                        "                    exchange.getResponseBody().flush();\n" +
+                        "                } else {\n" +
+                        "                    exchange.sendResponseHeaders(204, 0);\n" +
+                        "                }\n" +
+                        "            } else {\n" +
+                        "                sendData(staticPath + exchange.getRequestURI().getPath(), exchange);\n" +
+                        "\n" +
+                        "            }\n" +
+                        "            exchange.close();\n" +
+                        "\n" +
+                        "        });";
+        TreeNode tree = TreeBuilder.parseString(cfString);
+        FlowchartBuilder flowchartBuilder = new DotBuilder();
+//        flowchartBuilder.setDebug(true);
+        String r = flowchartBuilder.builder(tree);
+//        saveDot(cfString, r)
+        System.out.println(r);
+    }
 
 
 }

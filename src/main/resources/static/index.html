@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="utf-8">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Graphviz Online</title>
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+            margin: 0 0;
+        }
+
+        #editor {
+            margin: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 50%;
+            left: 0;
+        }
+
+        #review {
+            margin: 0;
+            position: absolute;
+            top: 50px;
+            bottom: 0;
+            right: 0;
+            left: 50%;
+            overflow: scroll;
+        }
+
+        #options {
+            margin: 0;
+            position: fixed;
+            left: 50%;
+            width: 100%;
+        }
+
+        #options {
+            flex: 0 0 auto;
+            background: #eee;
+            border-bottom: 1px solid #ccc;
+            padding: 8px;
+            overflow: hidden;
+        }
+
+        #options label {
+            margin-right: 8px;
+        }
+
+        #options #raw.disabled {
+            opacity: 0.5;
+        }
+
+        #shareurl {
+            display: none;
+        }
+
+        #status {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            display: block;
+            color: #FFF;
+            z-index: 999;
+        }
+
+        #review svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #status a {
+            z-index: 9999;
+            color: #FFF;
+        }
+
+        #review #text {
+            font-size: 12px;
+            font-family: monaco, courier, monospace;
+            white-space: pre;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+
+        #review img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        #review.working svg, #output.error svg,
+        #review.working #text, #output.error #text,
+        #review.working img, #output.error img {
+            opacity: 0.4;
+        }
+
+        #review.error #error {
+            display: inherit;
+        }
+
+        #review #error {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            margin-right: 20px;
+            background: red;
+            color: white;
+            z-index: 1;
+        }
+
+    </style>
+</head>
+<body>
+<pre id="editor"></pre>
+
+<div id="review">
+    <div id="error"></div>
+</div>
+<div id="status"></div>
+
+
+<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    (function (document) {
+        //http://stackoverflow.com/a/10372280/398634
+        window.URL = window.URL || window.webkitURL;
+        var el_stetus = document.getElementById("status"),
+            t_stetus = -1,
+            reviewer = document.getElementById("review"),
+            scale = window.devicePixelRatio || 1,
+            editor = ace.edit("editor"),
+            lastHD = -1,
+            worker = null,
+            parser = new DOMParser(),
+            showError = null,
+            // formatEl = document.querySelector("#format select"),
+            // engineEl = document.querySelector("#engine select"),
+            // rawEl = document.querySelector("#raw input"),
+            // shareEl = document.querySelector("#share"),
+            // shareURLEl = document.querySelector("#shareurl"),
+            errorEl = document.querySelector("#error");
+
+        function show_status(text, hide) {
+            hide = hide || 0;
+            clearTimeout(t_stetus);
+            el_stetus.innerHTML = text;
+            if (hide) {
+                t_stetus = setTimeout(function () {
+                    el_stetus.innerHTML = "";
+                }, hide);
+            }
+        }
+
+        function show_error(e) {
+            show_status("error", 500);
+            reviewer.classList.remove("working");
+            reviewer.classList.add("error");
+
+            var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
+            while (errorEl.firstChild) {
+                errorEl.removeChild(errorEl.firstChild);
+            }
+            errorEl.appendChild(document.createTextNode(message));
+        }
+
+        function svgXmlToImage(svgXml, callback) {
+            var pngImage = new Image(), svgImage = new Image();
+
+            svgImage.onload = function () {
+                var canvas = document.createElement("canvas");
+                canvas.width = svgImage.width * scale;
+                canvas.height = svgImage.height * scale;
+
+                var context = canvas.getContext("2d");
+                context.drawImage(svgImage, 0, 0, canvas.width, canvas.height);
+
+                pngImage.src = canvas.toDataURL("image/png");
+                pngImage.width = svgImage.width;
+                pngImage.height = svgImage.height;
+
+                if (callback !== undefined) {
+                    callback(null, pngImage);
+                }
+            }
+
+            svgImage.onerror = function (e) {
+                if (callback !== undefined) {
+                    callback(e);
+                }
+            }
+            svgImage.src = svgXml;
+        }
+
+        function copyToClipboard(str) {
+            const el = document.createElement('textarea');
+            el.value = str;
+            el.setAttribute('readonly', '');
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            const selected =
+                document.getSelection().rangeCount > 0
+                    ? document.getSelection().getRangeAt(0)
+                    : false;
+            el.select();
+            var result = document.execCommand('copy')
+            document.body.removeChild(el);
+            if (selected) {
+                document.getSelection().removeAllRanges();
+                document.getSelection().addRange(selected);
+            }
+            return result;
+        };
+
+        function renderGraph() {
+            reviewer.classList.add("working");
+            reviewer.classList.remove("error");
+
+            if (worker) {
+                worker.terminate();
+            }
+
+            worker = new Worker("full.render.js");
+            worker.addEventListener("message", function (e) {
+                if (typeof e.data.error !== "undefined") {
+                    var event = new CustomEvent("error", {"detail": new Error(e.data.error.message)});
+                    worker.dispatchEvent(event);
+                    return
+                }
+                show_status("done");
+                reviewer.classList.remove("working");
+                reviewer.classList.remove("error");
+                updateOutput(e.data.result);
+            }, false);
+            worker.addEventListener('error', function (e) {
+                show_error(e.detail);
+            }, false);
+
+            show_status("rendering...");
+
+            ajaxPost('api/parse/part/', editor.getSession().getDocument().getValue(), function (data) {
+                var params = {
+                    "src": data,
+                    "id": new Date().toJSON(),
+                    "options": {
+                        "files": [],
+                        "format": "svg",
+                        "engine": "dot"
+                    },
+                };
+                worker.postMessage(params);
+            })
+
+        }
+
+        function updateState() {
+            var content = encodeURIComponent(editor.getSession().getDocument().getValue());
+            history.pushState({"content": content}, "", "#" + content)
+        }
+
+        function updateOutput(result) {
+
+
+            var text = reviewer.querySelector("#text");
+            if (text) {
+                reviewer.removeChild(text);
+            }
+
+            // var a = reviewer.querySelector("a");
+            // if (a) {
+            //     reviewer.removeChild(a);
+            // }
+
+            var s = reviewer.querySelector("svg");
+            if (s) {
+                reviewer.removeChild(s);
+            }
+
+            if (!result) {
+                return;
+            }
+
+            reviewer.classList.remove("working");
+            reviewer.classList.remove("error");
+
+            // if (formatEl.value == "svg" && !rawEl.checked) {
+            var svg = parser.parseFromString(result, "image/svg+xml");
+            //get svg source.
+            var serializer = new XMLSerializer();
+            var source = serializer.serializeToString(svg);
+            //add name spaces.
+            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+            }
+            //add xml declaration
+            if (!source.startsWith("<?xml version")) {
+                source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+            }
+            // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
+            //const blob = new Blob(["\ufeff", svg], {type: 'image/svg+xml;charset=utf-8'});
+            const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+            var a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.download = "graphviz.svg";
+            a.textContent='下载'
+            a.style.zIndex=9999;
+            // reviewer.appendChild(a);
+            reviewer.appendChild(svg.documentElement);
+
+            show_status(a.outerHTML)
+
+            updateState()
+        }
+
+        editor.setTheme("ace/theme/twilight");
+        editor.getSession().setMode("ace/mode/java");
+        editor.getSession().on("change", function () {
+            clearTimeout(lastHD);
+            lastHD = setTimeout(renderGraph, 1500);
+        });
+
+        window.onpopstate = function (event) {
+            if (event.state != null && event.state.content != undefined) {
+                editor.getSession().setValue(decodeURIComponent(event.state.content));
+            }
+        };
+
+        /* come from sharing */
+        if (location.hash.length > 1) {
+            editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+        }
+
+        /* Init */
+        if (editor.getValue()) {
+            renderGraph();
+        }
+    })(document);
+
+
+    // ajax 对象
+    function ajaxObject() {
+        var xmlHttp;
+        try {
+            // Firefox, Opera 8.0+, Safari
+            xmlHttp = new XMLHttpRequest();
+        } catch (e) {
+            // Internet Explorer
+            try {
+                xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                try {
+                    xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (e) {
+                    alert("您的浏览器不支持AJAX！");
+                    return false;
+                }
+            }
+        }
+        return xmlHttp;
+    }
+
+    // ajax post请求：
+    function ajaxPost(url, data, fnSucceed, fnFail, fnLoading) {
+        var ajax = ajaxObject();
+        ajax.open("post", url, true);
+        ajax.setRequestHeader("Content-Type", "text/plain;charset=utf-8");
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    fnSucceed(ajax.responseText);
+                } else {
+                    fnFail("HTTP请求错误！错误码：" + ajax.status);
+                }
+            } else {
+                fnLoading();
+            }
+        }
+        ajax.send(data);
+
+    }
+</script>
+<script src="viz.js" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>
